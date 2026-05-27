@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ateliê — Cerâmica Fria & Velas Artesanais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────── RESET & TOKENS ─────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream:      #F7F2EC;
+  --warm-white: #FDFAF6;
+  --clay:       #C4784A;
+  --clay-light: #D9956A;
+  --clay-dark:  #9E5A30;
+  --linen:      #E8DDD0;
+  --charcoal:   #2C2420;
+  --text:       #3D2E26;
+  --muted:      #9C8878;
+  --border:     #DDD0C4;
+
+  --gap-sm:  16px;
+  --gap-md:  32px;
+  --gap-lg:  60px;
+  --px:      clamp(20px, 5vw, 80px);
+  --radius:  2px;
+}
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--warm-white);
+  color: var(--text);
+  font-weight: 300;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; width: 100%; height: 100%; object-fit: cover; }
+a { text-decoration: none; }
+
+/* ─────────────────────────── HAMBURGER MENU ─────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+.hamburger span {
+  display: block;
+  width: 22px; height: 1.5px;
+  background: var(--muted);
+  transition: transform .3s, opacity .3s;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* ─────────────────────────── NAV ─────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px var(--px);
+  background: rgba(253,250,246,.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-left, .nav-right {
+  display: flex; gap: 32px; align-items: center; list-style: none;
+  flex: 1;
+}
+.nav-right { justify-content: flex-end; gap: 24px; }
+.nav-left a, .nav-right a {
+  font-size: .72rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--muted); transition: color .2s;
+}
+.nav-left a:hover, .nav-right a:hover,
+.nav-left a.active { color: var(--clay); }
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400; letter-spacing: .06em;
+  color: var(--charcoal);
+  position: absolute; left: 50%; transform: translateX(-50%);
+  white-space: nowrap;
+}
+.nav-logo em { color: var(--clay); font-style: normal; }
+.nav-icon {
+  width: 17px; height: 17px;
+  stroke: var(--muted); fill: none; stroke-width: 1.5;
+  transition: stroke .2s; cursor: pointer; flex-shrink: 0;
+}
+.nav-icon:hover { stroke: var(--clay); }
+
+/* Mobile drawer */
+.mobile-drawer {
+  display: none;
+  position: fixed; inset: 0; z-index: 90;
+  background: var(--warm-white);
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 36px;
+  padding: 80px 40px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.mobile-drawer.open {
+  display: flex; opacity: 1; pointer-events: auto;
+}
+.mobile-drawer a {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; color: var(--charcoal); letter-spacing: .04em;
+  transition: color .2s;
+}
+.mobile-drawer a:hover { color: var(--clay); }
+
+/* ─────────────────────────── HERO ─────────────────────────── */
+.hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: clamp(90px,12vh,130px) var(--px) 60px;
+  gap: clamp(32px, 5vw, 72px);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 55% 90% at 80% 50%, #EDE0D0 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-text { position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: clamp(.95rem,1.5vw,1.1rem);
+  color: var(--clay); letter-spacing: .04em;
+  display: block; margin-bottom: 18px;
+  opacity: 0; animation: fadeUp .7s .15s forwards;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 300; line-height: 1.18;
+  color: var(--charcoal); margin-bottom: 24px;
+  opacity: 0; animation: fadeUp .7s .3s forwards;
+}
+.hero-sub {
+  font-size: clamp(.82rem, 1.2vw, .9rem);
+  line-height: 1.85; color: var(--muted);
+  max-width: 400px; margin-bottom: 44px;
+  opacity: 0; animation: fadeUp .7s .45s forwards;
+}
+.hero-actions {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp .7s .6s forwards;
+}
+.hero-image-col {
+  position: relative; z-index: 1;
+  opacity: 0; animation: fadeIn .9s .4s forwards;
+}
+.hero-frame {
+  width: 100%;
+  aspect-ratio: 3/4;
+  max-height: 540px;
+  background: var(--linen);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-frame::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(196,120,74,.07) 0%, transparent 55%);
+}
+.placeholder-inner {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  opacity: .5;
+}
+.placeholder-inner svg { width: 56px; height: 56px; stroke: var(--clay); fill: none; stroke-width: .9; }
+.placeholder-inner span {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem; color: var(--muted);
+}
+.photo-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(253,250,246,.88);
+  backdrop-filter: blur(6px);
+  padding: 10px 16px;
+  font-size: .68rem; letter-spacing: .08em;
+  color: var(--muted); text-align: center;
+  border-top: 1px solid var(--border);
+  z-index: 2;
+}
+
+/* ─────────────────────────── BUTTONS ─────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px;
+  font-family: 'Jost', sans-serif;
+  font-size: .72rem; font-weight: 400;
+  letter-spacing: .13em; text-transform: uppercase;
+  transition: background .25s, color .25s, transform .2s, border-color .25s;
+  cursor: pointer; border: 1px solid transparent;
+}
+.btn-fill { background: var(--clay); color: #fff; }
+.btn-fill:hover { background: var(--clay-dark); transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--clay); border-color: var(--clay); }
+.btn-ghost:hover { background: var(--clay); color: #fff; }
+
+/* ─────────────────────────── TICKER ─────────────────────────── */
+.ticker { background: var(--clay); padding: 13px 0; overflow: hidden; white-space: nowrap; }
+.ticker-track { display: inline-flex; animation: ticker 28s linear infinite; }
+.ticker-track span {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: .95rem;
+  color: rgba(255,255,255,.88); letter-spacing: .1em;
+  padding: 0 36px;
+}
+.ticker-track span::before { content: '✦'; margin-right: 36px; opacity: .45; }
+
+/* ─────────────────────────── FEATURES ─────────────────────────── */
+.features {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  border-bottom: 1px solid var(--border);
+}
+.feat {
+  padding: clamp(32px,5vw,56px) clamp(20px,3vw,40px);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  transition: background .3s;
+}
+.feat:last-child { border-right: none; }
+.feat:hover { background: var(--cream); }
+.feat-icon { margin-bottom: 14px; }
+.feat-icon svg { width: 28px; height: 28px; stroke: var(--clay); fill: none; stroke-width: 1.2; }
+.feat-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem,1.4vw,1.15rem); font-weight: 500;
+  color: var(--charcoal); margin-bottom: 8px;
+}
+.feat-text { font-size: .78rem; line-height: 1.75; color: var(--muted); }
+
+/* ─────────────────────────── SECTION HEAD ─────────────────────────── */
+.sec-head { text-align: center; margin-bottom: clamp(40px,6vw,64px); }
+.eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem;
+  color: var(--clay); letter-spacing: .06em;
+  display: block; margin-bottom: 10px;
+}
+.sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 300; line-height: 1.2;
+  color: var(--charcoal); margin-bottom: 14px;
+}
+.sec-sub {
+  font-size: .85rem; color: var(--muted);
+  line-height: 1.8; max-width: 480px; margin: 0 auto;
+}
+
+/* ─────────────────────────── COLLECTIONS ─────────────────────────── */
+.collections { padding: clamp(60px,10vw,100px) var(--px); }
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(5,1fr);
+  gap: clamp(16px,2vw,24px);
+}
+.col-card { cursor: pointer; }
+.col-img {
+  aspect-ratio: 3/4;
+  background: var(--linen);
+  overflow: hidden; position: relative; margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .4s ease;
+}
+.col-card:hover .col-img { transform: scale(1.01); }
+.col-img::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(44,36,32,.3) 0%, transparent 55%);
+  opacity: 0; transition: opacity .35s;
+}
+.col-card:hover .col-img::after { opacity: 1; }
+.col-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: .35;
+}
+.col-placeholder svg { width: 32px; height: 32px; stroke: var(--muted); fill: none; stroke-width: 1; }
+.col-placeholder span { font-size: .62rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.col-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem,1.4vw,1.2rem);
+  color: var(--charcoal); margin-bottom: 6px;
+}
+.col-desc { font-size: .76rem; color: var(--muted); line-height: 1.65; margin-bottom: 12px; }
+.col-link {
+  font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--clay); display: inline-flex; align-items: center; gap: 5px;
+  transition: gap .2s;
+}
+.col-link:hover { gap: 9px; }
+
+/* ─────────────────────────── ABOUT ─────────────────────────── */
+.about { display: grid; grid-template-columns: 1fr 1fr; min-height: 560px; }
+.about-img {
+  background: var(--linen);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 380px;
+}
+.about-img-placeholder { opacity: .3; }
+.about-img-placeholder svg { width: 72px; height: 72px; stroke: var(--muted); fill: none; stroke-width: .8; }
+.about-body {
+  background: var(--cream);
+  padding: clamp(48px,7vw,88px) clamp(32px,5vw,80px);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.about-body .eyebrow, .about-body .sec-title { text-align: left; }
+.about-body .sec-title { margin-bottom: 20px; }
+.about-p { font-size: .88rem; line-height: 1.95; color: var(--muted); margin-bottom: 36px; }
+
+/* ─────────────────────────── CANDLES ─────────────────────────── */
+.candles {
+  padding: clamp(60px,10vw,100px) var(--px);
+  background: var(--charcoal);
+}
+.candles .sec-title { color: var(--cream); }
+.candles .sec-sub { color: rgba(255,255,255,.38); }
+.candles .eyebrow { color: var(--clay-light); }
+.candles-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: clamp(16px,2vw,28px);
+  margin-top: clamp(40px,6vw,60px);
+}
+.candle-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: background .3s, transform .3s;
+  cursor: pointer;
+}
+.candle-card:hover { background: rgba(255,255,255,.08); transform: translateY(-4px); }
+.candle-img {
+  aspect-ratio: 1;
+  background: rgba(255,255,255,.03);
+  display: flex; align-items: center; justify-content: center;
+}
+.candle-ph {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: .18;
+}
+.candle-ph svg { width: 40px; height: 40px; stroke: var(--cream); fill: none; stroke-width: 1; }
+.candle-ph span { font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; color: var(--cream); }
+.candle-info { padding: 22px 26px 28px; }
+.candle-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.1rem,1.6vw,1.35rem);
+  color: var(--cream); margin-bottom: 8px;
+}
+.candle-desc { font-size: .78rem; color: rgba(255,255,255,.38); line-height: 1.75; }
+.candle-tag {
+  display: inline-block; margin-top: 14px;
+  padding: 5px 14px;
+  border: 1px solid rgba(196,120,74,.35);
+  font-size: .67rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--clay-light);
+}
+
+/* ─────────────────────────── INSTAGRAM ─────────────────────────── */
+.instagram { padding: clamp(60px,8vw,88px) var(--px); text-align: center; }
+.instagram .sec-title { font-size: clamp(1.4rem,2.5vw,1.8rem); margin-bottom: 0; }
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  gap: clamp(6px,1vw,10px);
+  margin: clamp(32px,5vw,48px) 0;
+}
+.ig-item {
+  aspect-ratio: 1;
+  background: var(--linen);
+  overflow: hidden; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.ig-item::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(196,120,74,.45);
+  opacity: 0; transition: opacity .3s;
+}
+.ig-item:hover::after { opacity: 1; }
+.ig-ph {
+  font-size: .55rem; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--muted); opacity: .4;
+}
+
+/* ─────────────────────────── FOOTER ─────────────────────────── */
+footer {
+  background: var(--cream);
+  padding: clamp(52px,8vw,80px) var(--px) 36px;
+  border-top: 1px solid var(--border);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: clamp(32px,4vw,60px);
+  margin-bottom: clamp(40px,6vw,60px);
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; color: var(--charcoal); letter-spacing: .06em;
+  display: block; margin-bottom: 14px;
+}
+.footer-logo em { color: var(--clay); font-style: normal; }
+.footer-tagline { font-size: .8rem; color: var(--muted); line-height: 1.75; max-width: 230px; }
+.footer-col h4 {
+  font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--charcoal); margin-bottom: 18px; font-weight: 500;
+}
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { font-size: .8rem; color: var(--muted); transition: color .2s; }
+.footer-col ul li a:hover { color: var(--clay); }
+.contact-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.contact-row svg { width: 15px; height: 15px; stroke: var(--clay); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+.contact-row a, .contact-row span { font-size: .8rem; color: var(--muted); }
+.contact-row a:hover { color: var(--clay); }
+.footer-bottom {
+  border-top: 1px solid var(--border); padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.footer-copy { font-size: .72rem; color: var(--muted); letter-spacing: .05em; }
+
+/* ─────────────────────────── ANIMATIONS ─────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.reveal {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─────────────────────────── SCROLL HINT ─────────────────────────── */
+.scroll-hint {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: .35;
+}
+.scroll-hint span { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.scroll-line { width: 1px; height: 44px; background: var(--clay); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse {
+  0%,100% { opacity: .3; transform: scaleY(1); }
+  50%      { opacity: 1; transform: scaleY(.5); transform-origin: top; }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — Tablet (≤ 900px)
+   ═══════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Nav */
+  .nav-left { display: none; }
+  .nav-right { display: none; }
+  .hamburger { display: flex; }
+
+  /* Hero */
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: clamp(90px,14vh,120px);
+    text-align: center;
+  }
+  .hero::before {
+    background: radial-gradient(ellipse 80% 50% at 50% 100%, #EDE0D0 0%, transparent 70%);
+  }
+  .hero-sub { margin-left: auto; margin-right: auto; }
+  .hero-actions { justify-content: center; }
+  .hero-image-col { order: -1; }
+  .hero-frame { max-height: 340px; aspect-ratio: 4/3; }
+  .scroll-hint { display: none; }
+
+  /* Features */
+  .features { grid-template-columns: repeat(2,1fr); }
+  .feat:nth-child(2) { border-right: none; }
+  .feat:nth-child(3) { border-top: 1px solid var(--border); }
+  .feat:nth-child(4) { border-top: 1px solid var(--border); border-right: none; }
+
+  /* Collections */
+  .collections-grid { grid-template-columns: repeat(3,1fr); }
+
+  /* About */
+  .about { grid-template-columns: 1fr; }
+  .about-img { min-height: 300px; }
+
+  /* Candles */
+  .candles-grid { grid-template-columns: repeat(2,1fr); }
+
+  /* Instagram */
+  .ig-grid { grid-template-columns: repeat(4,1fr); }
+  .ig-item:nth-child(n+5) { display: none; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — Mobile (≤ 560px)
+   ═══════════════════════════════════════════════ */
+@media (max-width: 560px) {
+  /* Hero */
+  .hero { padding-top: 88px; gap: 24px; }
+  .hero-frame { aspect-ratio: 1; max-height: 280px; }
+
+  /* Features */
+  .features { grid-template-columns: 1fr 1fr; }
+
+  /* Collections */
+  .collections-grid { grid-template-columns: repeat(2,1fr); }
+  .col-card:last-child { display: none; } /* hide 5th on very small */
+
+  /* Candles */
+  .candles-grid { grid-template-columns: 1fr; }
+
+  /* Instagram */
+  .ig-grid { grid-template-columns: repeat(3,1fr); }
+  .ig-item:nth-child(n+4) { display: none; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ NAV ════════════ -->
+<nav>
+  <ul class="nav-left">
+    <li><a href="#home" class="active">Home</a></li>
+    <li><a href="#colecoes">Coleções</a></li>
+    <li><a href="#velas">Velas</a></li>
+  </ul>
+
+  <a href="#home" class="nav-logo">ateliê <em>✦</em></a>
+
+  <div class="nav-right">
+    <a href="#sobre">Sobre</a>
+    <a href="#contato">Contato</a>
+    <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="var(--muted)"/></svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </div>
+
+  <button class="hamburger" id="ham" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="mobile-drawer" id="drawer">
+  <a href="#home"     onclick="closeDrawer()">Home</a>
+  <a href="#colecoes" onclick="closeDrawer()">Coleções</a>
+  <a href="#velas"    onclick="closeDrawer()">Velas</a>
+  <a href="#sobre"    onclick="closeDrawer()">Sobre</a>
+  <a href="#contato"  onclick="closeDrawer()">Contato</a>
+</div>
+
+<!-- ════════════ HERO ════════════ -->
+<section class="hero" id="home">
+  <div class="hero-text">
+    <em class="hero-eyebrow">cerâmica fria & velas artesanais</em>
+    <h1 class="hero-title">Detalhes feitos<br>com amor,<br>cuidado e tempo.</h1>
+    <p class="hero-sub">Cada peça nasce das mãos com intenção — para guardar memórias, marcar momentos e encher de beleza os espaços que amamos.</p>
+    <div class="hero-actions">
+      <a href="#colecoes" class="btn btn-fill">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Ver coleções
+      </a>
+      <a href="#contato" class="btn btn-ghost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Fazer encomenda
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-image-col">
+    <div class="hero-frame">
+      <div class="placeholder-inner">
+        <svg viewBox="0 0 64 64"><ellipse cx="32" cy="40" rx="22" ry="14"/><path d="M10 40 Q12 20 32 18 Q52 20 54 40"/><path d="M24 18 Q26 10 32 8 Q38 10 40 18"/></svg>
+        <span>Sua foto aqui</span>
+      </div>
+      <div class="photo-label">📸 Foto do produto em destaque</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Explorar</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ════════════ TICKER ════════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Feito à mão</span><span>Cerâmica fria</span><span>Velas artesanais</span>
+    <span>Com amor</span><span>Momentos únicos</span><span>Personalizado</span>
+    <span>Feito à mão</span><span>Cerâmica fria</span><span>Velas artesanais</span>
+    <span>Com amor</span><span>Momentos únicos</span><span>Personalizado</span>
+  </div>
+</div>
+
+<!-- ════════════ FEATURES ════════════ -->
+<div class="features">
+  <div class="feat reveal">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M6 14v-3a2 2 0 0 0-4 0v7c0 2.21 1.79 4 4 4h8a4 4 0 0 0 4-4v-1a2 2 0 0 0-4 0v1"/></svg></div>
+    <h3 class="feat-title">Feito à mão</h3>
+    <p class="feat-text">Cada peça é modelada com cuidado e dedicação, única em sua essência.</p>
+  </div>
+  <div class="feat reveal">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <h3 class="feat-title">Materiais de qualidade</h3>
+    <p class="feat-text">Cerâmica fria de alta qualidade, durável e delicada. Velas com aromas naturais.</p>
+  </div>
+  <div class="feat reveal">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+    <h3 class="feat-title">Personalizados</h3>
+    <p class="feat-text">Peças exclusivas para momentos inesquecíveis e presentes com significado.</p>
+  </div>
+  <div class="feat reveal">
+    <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+    <h3 class="feat-title">Com amor</h3>
+    <p class="feat-text">Criadas para transmitir afeto e guardar boas lembranças para sempre.</p>
+  </div>
+</div>
+
+<!-- ════════════ COLLECTIONS ════════════ -->
+<section class="collections" id="colecoes">
+  <div class="sec-head reveal">
+    <span class="eyebrow">nosso trabalho</span>
+    <h2 class="sec-title">Coleções</h2>
+    <p class="sec-sub">Peças que contam histórias e eternizam sentimentos.</p>
+  </div>
+  <div class="collections-grid">
+    <div class="col-card reveal">
+      <div class="col-img">
+        <div class="col-placeholder"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M12 14v8M8 22h8"/></svg><span>foto</span></div>
+        <div class="photo-label">📸 Foto aqui</div>
+      </div>
+      <h3 class="col-name">Fé</h3>
+      <p class="col-desc">Mensagens que fortalecem a alma.</p>
+      <a href="#" class="col-link">Ver coleção →</a>
+    </div>
+    <div class="col-card reveal">
+      <div class="col-img">
+        <div class="col-placeholder"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>foto</span></div>
+        <div class="photo-label">📸 Foto aqui</div>
+      </div>
+      <h3 class="col-name">Afeto</h3>
+      <p class="col-desc">Homenagens que abraçam o coração.</p>
+      <a href="#" class="col-link">Ver coleção →</a>
+    </div>
+    <div class="col-card reveal">
+      <div class="col-img">
+        <div class="col-placeholder"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>foto</span></div>
+        <div class="photo-label">📸 Foto aqui</div>
+      </div>
+      <h3 class="col-name">Família</h3>
+      <p class="col-desc">Memórias que nunca se esquecem.</p>
+      <a href="#" class="col-link">Ver coleção →</a>
+    </div>
+    <div class="col-card reveal">
+      <div class="col-img">
+        <div class="col-placeholder"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>foto</span></div>
+        <div class="photo-label">📸 Foto aqui</div>
+      </div>
+      <h3 class="col-name">Memórias</h3>
+      <p class="col-desc">Detalhes que guardam grandes histórias.</p>
+      <a href="#" class="col-link">Ver coleção →</a>
+    </div>
+    <div class="col-card reveal">
+      <div class="col-img">
+        <div class="col-placeholder"><svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8c-2.5 2-4 4-4 6s1.5 4 4 4 4-2 4-4-1.5-4-4-6z"/></svg><span>foto</span></div>
+        <div class="photo-label">📸 Foto aqui</div>
+      </div>
+      <h3 class="col-name">Florescer</h3>
+      <p class="col-desc">Beleza, delicadeza e inspiração.</p>
+      <a href="#" class="col-link">Ver coleção →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ ABOUT ════════════ -->
+<section class="about" id="sobre">
+  <div class="about-img">
+    <div class="about-img-placeholder">
+      <svg viewBox="0 0 80 80"><circle cx="40" cy="26" r="14"/><path d="M10 70c0-16.57 13.43-30 30-30s30 13.43 30 30"/></svg>
+    </div>
+    <div class="photo-label">📸 Foto sua trabalhando no ateliê</div>
+  </div>
+  <div class="about-body">
+    <span class="eyebrow">sobre o ateliê</span>
+    <h2 class="sec-title">Mais que peças,<br>criamos significados.</h2>
+    <p class="about-p">O ateliê nasceu do desejo de transformar sentimentos em forma — em cerâmica fria delicada, em velas que preenchem o ar com aroma e aconchego. Cada criação carrega histórias, amor e intenção.<br><br>Tudo feito à mão, com calma e cuidado. Porque acreditamos que os detalhes fazem toda a diferença.</p>
+    <a href="#contato" class="btn btn-fill" style="align-self:flex-start">Conheça nossa história</a>
+  </div>
+</section>
+
+<!-- ════════════ CANDLES ════════════ -->
+<section class="candles" id="velas">
+  <div class="sec-head reveal">
+    <span class="eyebrow">nova linha</span>
+    <h2 class="sec-title">Velas Artesanais</h2>
+    <p class="sec-sub">Aromas que criam atmosferas e acendem memórias.</p>
+  </div>
+  <div class="candles-grid">
+    <div class="candle-card reveal">
+      <div class="candle-img"><div class="candle-ph"><svg viewBox="0 0 24 24"><path d="M12 2s-2 4-2 7a2 2 0 0 0 4 0c0-3-2-7-2-7z"/><rect x="8" y="11" width="8" height="11" rx="1"/></svg><span>foto</span></div></div>
+      <div class="candle-info">
+        <h3 class="candle-name">Lavanda & Baunilha</h3>
+        <p class="candle-desc">Aroma suave e acolhedor para relaxar e trazer paz ao ambiente.</p>
+        <span class="candle-tag">Aromaterapia</span>
+      </div>
+    </div>
+    <div class="candle-card reveal">
+      <div class="candle-img"><div class="candle-ph"><svg viewBox="0 0 24 24"><path d="M12 2s-2 4-2 7a2 2 0 0 0 4 0c0-3-2-7-2-7z"/><rect x="8" y="11" width="8" height="11" rx="1"/></svg><span>foto</span></div></div>
+      <div class="candle-info">
+        <h3 class="candle-name">Rosa & Sândalo</h3>
+        <p class="candle-desc">Sofisticado e floral, perfeito para presentear com elegância.</p>
+        <span class="candle-tag">Presente ideal</span>
+      </div>
+    </div>
+    <div class="candle-card reveal">
+      <div class="candle-img"><div class="candle-ph"><svg viewBox="0 0 24 24"><path d="M12 2s-2 4-2 7a2 2 0 0 0 4 0c0-3-2-7-2-7z"/><rect x="8" y="11" width="8" height="11" rx="1"/></svg><span>foto</span></div></div>
+      <div class="candle-info">
+        <h3 class="candle-name">Personalizada</h3>
+        <p class="candle-desc">Escolha o aroma, o recipiente e a mensagem. Feita especialmente para você.</p>
+        <span class="candle-tag">Encomenda</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ INSTAGRAM ════════════ -->
+<section class="instagram">
+  <div class="sec-head reveal">
+    <h2 class="sec-title">Acompanhe o ateliê ♡</h2>
+  </div>
+  <div class="ig-grid">
+    <div class="ig-item"><span class="ig-ph">foto 1</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 2</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 3</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 4</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 5</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 6</span></div>
+    <div class="ig-item"><span class="ig-ph">foto 7</span></div>
+  </div>
+  <a href="#" class="btn btn-ghost">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+    Ver mais no Instagram
+  </a>
+</section>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer id="contato">
+  <div class="footer-grid">
+    <div>
+      <a href="#home" class="footer-logo">ateliê <em>✦</em></a>
+      <p class="footer-tagline">Cerâmica fria & velas artesanais feitas à mão para eternizar sentimentos e decorar com propósito.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#colecoes">Coleções</a></li>
+        <li><a href="#velas">Velas</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <div class="contact-row">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <a href="#">Enviar mensagem</a>
+      </div>
+      <div class="contact-row">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="var(--clay)"/></svg>
+        <a href="#">@seuatelie</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Informações</h4>
+      <ul>
+        <li><a href="#">Perguntas frequentes</a></li>
+        <li><a href="#">Política de privacidade</a></li>
+        <li><a href="#">Trocas e devoluções</a></li>
+        <li><a href="#">Cuidados com as peças</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2024 Ateliê. Todos os direitos reservados.</span>
+    <span class="footer-copy" style="color:var(--clay)">Feito com ♡</span>
+  </div>
+</footer>
+
+<!-- ════════════ JS ════════════ -->
+<script>
+  // ── Hamburger
+  const ham = document.getElementById('ham');
+  const drawer = document.getElementById('drawer');
+  ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    drawer.classList.toggle('open');
+    document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+  });
+  function closeDrawer() {
+    ham.classList.remove('open');
+    drawer.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-left a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id; });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
+    });
+  }, { passive: true });
+
+  // ── Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i % 4) * 80 + 'ms';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
