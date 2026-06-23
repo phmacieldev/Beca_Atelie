@@ -910,67 +910,80 @@ let isSignUp = false;
 
 var SIGNUP_HASH = 'e24540c8b207651575f4b6f6a77918aa2656b10a1354925c85ddd40ecac00ffa';
 
-async function hashText(text) {
+function hashText(text) {
   var encoded = new TextEncoder().encode(text);
-  var buffer = await crypto.subtle.digest('SHA-256', encoded);
-  return Array.from(new Uint8Array(buffer)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  return crypto.subtle.digest('SHA-256', encoded).then(function(buffer) {
+    return Array.from(new Uint8Array(buffer)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  });
 }
 
 document.getElementById('toggleMode').addEventListener('click', function(e) {
   e.preventDefault();
   isSignUp = !isSignUp;
+  var kwField = document.getElementById('loginKeyword');
   document.getElementById('loginBtn').textContent = isSignUp ? 'Criar conta' : 'Entrar';
   document.getElementById('toggleMode').textContent = isSignUp ? 'Já tenho conta' : 'Criar conta';
   document.getElementById('loginToggle').firstChild.textContent = isSignUp ? '' : 'Primeira vez? ';
-  document.getElementById('loginKeyword').style.display = isSignUp ? '' : 'none';
-  document.getElementById('loginKeyword').value = '';
+  kwField.style.display = isSignUp ? '' : 'none';
+  kwField.required = isSignUp;
+  kwField.value = '';
   document.getElementById('loginError').textContent = '';
 });
 
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
+document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
   if (!isConfigured) {
     document.getElementById('loginError').textContent = 'Firebase não está configurado. Veja as instruções acima.';
     return;
   }
-  const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPass').value;
-  const btn = document.getElementById('loginBtn');
+  var email = document.getElementById('loginEmail').value;
+  var pass = document.getElementById('loginPass').value;
+  var btn = document.getElementById('loginBtn');
   btn.disabled = true;
   document.getElementById('loginError').textContent = '';
 
+  function doAuth() {
+    var action = isSignUp
+      ? auth.createUserWithEmailAndPassword(email, pass)
+      : auth.signInWithEmailAndPassword(email, pass);
+    action
+      .then(function() { /* onAuthStateChanged handles UI */ })
+      .catch(function(err) {
+        var msg = 'Erro. Tente novamente.';
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          msg = 'E-mail ou senha incorretos.';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = 'E-mail inválido.';
+        } else if (err.code === 'auth/too-many-requests') {
+          msg = 'Muitas tentativas. Aguarde um momento.';
+        } else if (err.code === 'auth/email-already-in-use') {
+          msg = 'Este e-mail já tem conta. Faça login.';
+        } else if (err.code === 'auth/weak-password') {
+          msg = 'Senha muito curta. Use pelo menos 6 caracteres.';
+        }
+        document.getElementById('loginError').textContent = msg;
+        btn.disabled = false;
+      });
+  }
+
   if (isSignUp) {
     var keyword = document.getElementById('loginKeyword').value.trim();
-    var keywordHash = await hashText(keyword);
-    if (keywordHash !== SIGNUP_HASH) {
-      document.getElementById('loginError').textContent = 'Palavra-chave incorreta.';
+    if (!keyword) {
+      document.getElementById('loginError').textContent = 'Digite a palavra-chave de acesso.';
       btn.disabled = false;
       return;
     }
-  }
-
-  var action = isSignUp
-    ? auth.createUserWithEmailAndPassword(email, pass)
-    : auth.signInWithEmailAndPassword(email, pass);
-
-  action
-    .then(() => { /* onAuthStateChanged handles UI */ })
-    .catch(function(err) {
-      let msg = 'Erro. Tente novamente.';
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        msg = 'E-mail ou senha incorretos.';
-      } else if (err.code === 'auth/invalid-email') {
-        msg = 'E-mail inválido.';
-      } else if (err.code === 'auth/too-many-requests') {
-        msg = 'Muitas tentativas. Aguarde um momento.';
-      } else if (err.code === 'auth/email-already-in-use') {
-        msg = 'Este e-mail já tem conta. Faça login.';
-      } else if (err.code === 'auth/weak-password') {
-        msg = 'Senha muito curta. Use pelo menos 6 caracteres.';
+    hashText(keyword).then(function(keywordHash) {
+      if (keywordHash !== SIGNUP_HASH) {
+        document.getElementById('loginError').textContent = 'Palavra-chave incorreta.';
+        btn.disabled = false;
+        return;
       }
-      document.getElementById('loginError').textContent = msg;
-      btn.disabled = false;
+      doAuth();
     });
+  } else {
+    doAuth();
+  }
 });
 
 document.getElementById('logoutBtn').addEventListener('click', function() {
