@@ -423,14 +423,14 @@ img { max-width: 100%; display: block; }
       <div class="topbar-logo">Beca <em>Ateliê</em> <span>Painel</span></div>
       <nav class="tab-nav" id="tabNav">
         <button class="tab-btn active" data-tab="geral">Geral</button>
-        <button class="tab-btn" data-tab="hero">Hero</button>
+        <button class="tab-btn" data-tab="hero">Início</button>
         <button class="tab-btn" data-tab="colecoes">Coleções</button>
         <button class="tab-btn" data-tab="sobre">Sobre</button>
         <button class="tab-btn" data-tab="velas">Velas</button>
         <button class="tab-btn" data-tab="instagram">Instagram</button>
-        <button class="tab-btn" data-tab="ticker">Ticker</button>
-        <button class="tab-btn" data-tab="diferenciais">Diferenciais</button>
-        <button class="tab-btn" data-tab="secoes">Seções+</button>
+        <button class="tab-btn" data-tab="ticker">Faixa</button>
+        <button class="tab-btn" data-tab="diferenciais">Destaques</button>
+        <button class="tab-btn" data-tab="secoes">Extras</button>
       </nav>
       <button class="logout-btn" id="logoutBtn">Sair</button>
     </div>
@@ -467,51 +467,52 @@ img { max-width: 100%; display: block; }
       </div>
 
       <div class="field">
-        <label class="field-label">WhatsApp (número)</label>
+        <label class="field-label">WhatsApp</label>
         <input type="text" id="gen-whatsapp" placeholder="5511999999999">
-        <p class="field-hint">Formato: código do país + DDD + número, sem espaços. Ex: 5511999999999</p>
+        <p class="field-hint">Apenas números, com DDD. Ex: 5511999999999</p>
       </div>
 
       <div class="field">
-        <label class="field-label">Mensagem padrão do WhatsApp</label>
+        <label class="field-label">Mensagem automática do WhatsApp</label>
         <textarea id="gen-whatsappMsg" placeholder="Olá! Gostaria de fazer uma encomenda no Beca Ateliê."></textarea>
       </div>
     </div>
 
     <!-- ════ TAB: Hero ════ -->
     <div class="tab-panel" id="tab-hero">
-      <h2 class="tab-panel-title">Seção Hero</h2>
-      <p class="tab-panel-desc">Conteúdo principal que aparece ao abrir o site.</p>
+      <h2 class="tab-panel-title">Página Inicial</h2>
+      <p class="tab-panel-desc">O que aparece primeiro quando alguém abre o site.</p>
 
       <div class="field">
-        <label class="field-label">Texto pequeno (eyebrow)</label>
+        <label class="field-label">Frase de destaque</label>
         <input type="text" id="hero-eyebrow" placeholder="cerâmica fria & velas artesanais">
+        <p class="field-hint">Aparece em itálico acima do título.</p>
       </div>
 
       <div class="field">
-        <label class="field-label">Título principal</label>
-        <textarea id="hero-title" rows="3" placeholder="Detalhes feitos&lt;br&gt;com amor,&lt;br&gt;cuidado e tempo."></textarea>
-        <p class="field-hint">Use &lt;br&gt; para quebras de linha.</p>
+        <label class="field-label">Título</label>
+        <textarea id="hero-title" rows="3" placeholder="Detalhes feitos&#10;com amor,&#10;cuidado e tempo."></textarea>
+        <p class="field-hint">Quebre a linha normalmente com Enter.</p>
       </div>
 
       <div class="field">
-        <label class="field-label">Subtítulo</label>
+        <label class="field-label">Descrição curta</label>
         <textarea id="hero-subtitle" rows="3" placeholder="Cada peça nasce das mãos com intenção..."></textarea>
       </div>
 
       <div class="field">
-        <label class="field-label">Imagem de destaque</label>
+        <label class="field-label">Foto principal</label>
         <div class="image-input-group" data-target="hero-image">
           <div class="image-input-row">
-            <input type="url" id="hero-image" placeholder="Cole aqui o link da imagem ou do Google Drive">
-            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>
+            <input type="url" id="hero-image" placeholder="Cole o link da foto (Google Drive ou outro)">
+            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>
           </div>
           <div class="gdrive-helper">
-            <strong>Como usar imagens do Google Drive:</strong><br>
-            1. Abra a imagem no Google Drive<br>
+            <strong>Como usar fotos do Google Drive:</strong><br>
+            1. Abra a foto no Google Drive<br>
             2. Clique em "Compartilhar" e copie o link<br>
             3. Cole o link no campo acima<br>
-            O sistema converte automaticamente para um link direto.
+            Pronto! O sistema ajusta o link sozinho.
           </div>
           <div class="image-preview" id="preview-hero-image"><img></div>
         </div>
@@ -519,23 +520,12 @@ img { max-width: 100%; display: block; }
 
       <div class="fields-row">
         <div class="field">
-          <label class="field-label">Botão 1 - Texto</label>
+          <label class="field-label">Texto do primeiro botão</label>
           <input type="text" id="hero-cta1Text" placeholder="Ver coleções">
         </div>
         <div class="field">
-          <label class="field-label">Botão 1 - Link</label>
-          <input type="text" id="hero-cta1Link" placeholder="#colecoes">
-        </div>
-      </div>
-
-      <div class="fields-row">
-        <div class="field">
-          <label class="field-label">Botão 2 - Texto</label>
+          <label class="field-label">Texto do segundo botão</label>
           <input type="text" id="hero-cta2Text" placeholder="Fazer encomenda">
-        </div>
-        <div class="field">
-          <label class="field-label">Botão 2 - Link</label>
-          <input type="text" id="hero-cta2Link" placeholder="#contato">
         </div>
       </div>
     </div>
@@ -551,49 +541,44 @@ img { max-width: 100%; display: block; }
     <!-- ════ TAB: Sobre ════ -->
     <div class="tab-panel" id="tab-sobre">
       <h2 class="tab-panel-title">Sobre o Ateliê</h2>
-      <p class="tab-panel-desc">Informações sobre você e seu trabalho.</p>
+      <p class="tab-panel-desc">Conte sua história para quem visitar o site.</p>
 
       <div class="field">
-        <label class="field-label">Texto pequeno (eyebrow)</label>
+        <label class="field-label">Frase de destaque</label>
         <input type="text" id="about-eyebrow" placeholder="sobre o ateliê">
+        <p class="field-hint">Aparece em itálico acima do título.</p>
       </div>
 
       <div class="field">
         <label class="field-label">Título</label>
-        <textarea id="about-title" rows="2" placeholder="Mais que peças,&lt;br&gt;criamos significados."></textarea>
-        <p class="field-hint">Use &lt;br&gt; para quebras de linha.</p>
+        <textarea id="about-title" rows="2" placeholder="Mais que peças,&#10;criamos significados."></textarea>
+        <p class="field-hint">Quebre a linha normalmente com Enter.</p>
       </div>
 
       <div class="field">
-        <label class="field-label">Texto</label>
+        <label class="field-label">Sua história</label>
         <textarea id="about-text" rows="5" placeholder="Conte a história do seu ateliê..."></textarea>
-        <p class="field-hint">Use &lt;br&gt;&lt;br&gt; para separar parágrafos.</p>
-      </div>
-
-      <div class="fields-row">
-        <div class="field">
-          <label class="field-label">Texto do botão</label>
-          <input type="text" id="about-buttonText" placeholder="Conheça nossa história">
-        </div>
-        <div class="field">
-          <label class="field-label">Link do botão</label>
-          <input type="text" id="about-buttonLink" placeholder="#contato">
-        </div>
+        <p class="field-hint">Pule uma linha para separar parágrafos.</p>
       </div>
 
       <div class="field">
-        <label class="field-label">Imagem</label>
+        <label class="field-label">Texto do botão</label>
+        <input type="text" id="about-buttonText" placeholder="Conheça nossa história">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Sua foto</label>
         <div class="image-input-group" data-target="about-image">
           <div class="image-input-row">
-            <input type="url" id="about-image" placeholder="Cole aqui o link da imagem ou do Google Drive">
-            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>
+            <input type="url" id="about-image" placeholder="Cole o link da foto (Google Drive ou outro)">
+            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>
           </div>
           <div class="gdrive-helper">
-            <strong>Como usar imagens do Google Drive:</strong><br>
-            1. Abra a imagem no Google Drive<br>
+            <strong>Como usar fotos do Google Drive:</strong><br>
+            1. Abra a foto no Google Drive<br>
             2. Clique em "Compartilhar" e copie o link<br>
             3. Cole o link no campo acima<br>
-            O sistema converte automaticamente para um link direto.
+            Pronto! O sistema ajusta o link sozinho.
           </div>
           <div class="image-preview" id="preview-about-image"><img></div>
         </div>
@@ -611,30 +596,30 @@ img { max-width: 100%; display: block; }
     <!-- ════ TAB: Instagram ════ -->
     <div class="tab-panel" id="tab-instagram">
       <h2 class="tab-panel-title">Fotos do Instagram</h2>
-      <p class="tab-panel-desc">Imagens exibidas na galeria do Instagram no site.</p>
+      <p class="tab-panel-desc">Fotos que aparecem na seção do Instagram no site.</p>
       <div id="instagram-list"></div>
       <button type="button" class="add-btn" onclick="addInstagramPhoto()">Adicionar foto</button>
     </div>
 
     <!-- ════ TAB: Ticker ════ -->
     <div class="tab-panel" id="tab-ticker">
-      <h2 class="tab-panel-title">Faixa de Texto (Ticker)</h2>
-      <p class="tab-panel-desc">Palavras que passam na faixa animada abaixo do hero.</p>
+      <h2 class="tab-panel-title">Faixa Animada</h2>
+      <p class="tab-panel-desc">Palavras que passam na faixa colorida abaixo da foto principal.</p>
       <div id="ticker-list"></div>
       <button type="button" class="add-btn" onclick="addTickerItem()">Adicionar texto</button>
     </div>
 
     <!-- ════ TAB: Diferenciais ════ -->
     <div class="tab-panel" id="tab-diferenciais">
-      <h2 class="tab-panel-title">Diferenciais</h2>
-      <p class="tab-panel-desc">Os 4 destaques que aparecem abaixo da faixa de texto.</p>
+      <h2 class="tab-panel-title">Destaques da Marca</h2>
+      <p class="tab-panel-desc">Os 4 diferenciais que aparecem logo abaixo da faixa animada.</p>
       <div id="features-list"></div>
     </div>
 
     <!-- ════ TAB: Seções+ ════ -->
     <div class="tab-panel" id="tab-secoes">
-      <h2 class="tab-panel-title">Seções Personalizadas</h2>
-      <p class="tab-panel-desc">Crie seções adicionais para o seu site. Escolha um modelo abaixo.</p>
+      <h2 class="tab-panel-title">Seções Extras</h2>
+      <p class="tab-panel-desc">Adicione novas seções ao site. Escolha um modelo e preencha o conteúdo.</p>
 
       <div class="template-grid" id="templateGrid">
         <div class="template-card" onclick="addCustomSection('gallery')">
@@ -933,26 +918,24 @@ function collectGeral() {
 function renderHero() {
   var h = siteData.hero;
   document.getElementById('hero-eyebrow').value = h.eyebrow || '';
-  document.getElementById('hero-title').value = h.title || '';
+  document.getElementById('hero-title').value = (h.title || '').replace(/<br\s*\/?>/gi, '\n');
   document.getElementById('hero-subtitle').value = h.subtitle || '';
   document.getElementById('hero-image').value = h.image || '';
   document.getElementById('hero-cta1Text').value = h.cta1Text || '';
-  document.getElementById('hero-cta1Link').value = h.cta1Link || '';
   document.getElementById('hero-cta2Text').value = h.cta2Text || '';
-  document.getElementById('hero-cta2Link').value = h.cta2Link || '';
   updateImagePreview('hero-image');
 }
 
 function collectHero() {
   siteData.hero = {
     eyebrow: document.getElementById('hero-eyebrow').value,
-    title: document.getElementById('hero-title').value,
+    title: document.getElementById('hero-title').value.replace(/\n/g, '<br>'),
     subtitle: document.getElementById('hero-subtitle').value,
     image: document.getElementById('hero-image').value,
     cta1Text: document.getElementById('hero-cta1Text').value,
-    cta1Link: document.getElementById('hero-cta1Link').value,
+    cta1Link: '#colecoes',
     cta2Text: document.getElementById('hero-cta2Text').value,
-    cta2Link: document.getElementById('hero-cta2Link').value
+    cta2Link: '#contato'
   };
 }
 
@@ -960,10 +943,9 @@ function collectHero() {
 function renderAbout() {
   var a = siteData.about;
   document.getElementById('about-eyebrow').value = a.eyebrow || '';
-  document.getElementById('about-title').value = a.title || '';
-  document.getElementById('about-text').value = a.text || '';
+  document.getElementById('about-title').value = (a.title || '').replace(/<br\s*\/?>/gi, '\n');
+  document.getElementById('about-text').value = (a.text || '').replace(/<br\s*\/?>/gi, '\n');
   document.getElementById('about-buttonText').value = a.buttonText || '';
-  document.getElementById('about-buttonLink').value = a.buttonLink || '';
   document.getElementById('about-image').value = a.image || '';
   updateImagePreview('about-image');
 }
@@ -971,10 +953,10 @@ function renderAbout() {
 function collectAbout() {
   siteData.about = {
     eyebrow: document.getElementById('about-eyebrow').value,
-    title: document.getElementById('about-title').value,
-    text: document.getElementById('about-text').value,
+    title: document.getElementById('about-title').value.replace(/\n/g, '<br>'),
+    text: document.getElementById('about-text').value.replace(/\n/g, '<br>'),
     buttonText: document.getElementById('about-buttonText').value,
-    buttonLink: document.getElementById('about-buttonLink').value,
+    buttonLink: '#contato',
     image: document.getElementById('about-image').value
   };
 }
@@ -1018,28 +1000,22 @@ function createCollectionCard(col, index) {
         '<button class="card-btn danger" onclick="removeCollection(' + index + ')">Remover</button>' +
       '</div>' +
     '</div>' +
-    '<div class="fields-row">' +
-      '<div class="field">' +
-        '<label class="field-label">Nome</label>' +
-        '<input type="text" data-field="name" value="' + escHtml(col.name) + '">' +
-      '</div>' +
-      '<div class="field">' +
-        '<label class="field-label">Link</label>' +
-        '<input type="text" data-field="link" value="' + escHtml(col.link) + '">' +
-      '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Nome</label>' +
+      '<input type="text" data-field="name" value="' + escHtml(col.name) + '">' +
     '</div>' +
     '<div class="field">' +
-      '<label class="field-label">Descrição</label>' +
+      '<label class="field-label">Descrição curta</label>' +
       '<input type="text" data-field="description" value="' + escHtml(col.description) + '">' +
     '</div>' +
     '<div class="field">' +
       '<label class="field-label">Imagem</label>' +
       '<div class="image-input-group">' +
         '<div class="image-input-row">' +
-          '<input type="url" data-field="image" value="' + escHtml(col.image) + '" placeholder="Link da imagem ou Google Drive">' +
-          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+          '<input type="url" data-field="image" value="' + escHtml(col.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
         '</div>' +
-        '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive. O sistema converte automaticamente.</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
         '<div class="image-preview' + (col.image ? ' visible' : '') + '"><img src="' + escHtml(col.image) + '"></div>' +
       '</div>' +
     '</div>';
@@ -1054,7 +1030,7 @@ function collectCollections() {
       name: card.querySelector('[data-field="name"]').value,
       description: card.querySelector('[data-field="description"]').value,
       image: card.querySelector('[data-field="image"]').value,
-      link: card.querySelector('[data-field="link"]').value
+      link: '#'
     });
   });
 }
@@ -1120,10 +1096,10 @@ function createCandleCard(candle, index) {
       '<label class="field-label">Imagem</label>' +
       '<div class="image-input-group">' +
         '<div class="image-input-row">' +
-          '<input type="url" data-field="image" value="' + escHtml(candle.image) + '" placeholder="Link da imagem ou Google Drive">' +
-          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+          '<input type="url" data-field="image" value="' + escHtml(candle.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
         '</div>' +
-        '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive. O sistema converte automaticamente.</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
         '<div class="image-preview' + (candle.image ? ' visible' : '') + '"><img src="' + escHtml(candle.image) + '"></div>' +
       '</div>' +
     '</div>';
@@ -1188,10 +1164,10 @@ function createInstagramCard(photo, index) {
       '<label class="field-label">Imagem</label>' +
       '<div class="image-input-group">' +
         '<div class="image-input-row">' +
-          '<input type="url" data-field="image" value="' + escHtml(photo.image) + '" placeholder="Link da imagem ou Google Drive">' +
-          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+          '<input type="url" data-field="image" value="' + escHtml(photo.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
         '</div>' +
-        '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive. O sistema converte automaticamente.</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
         '<div class="image-preview' + (photo.image ? ' visible' : '') + '"><img src="' + escHtml(photo.image) + '"></div>' +
       '</div>' +
     '</div>';
@@ -1350,22 +1326,22 @@ function createCustomSectionCard(sec, index) {
 
   var commonFields =
     '<div class="field">' +
-      '<label class="field-label">Texto pequeno (eyebrow)</label>' +
-      '<input type="text" data-field="eyebrow" value="' + escHtml(sec.eyebrow || '') + '">' +
+      '<label class="field-label">Frase de destaque</label>' +
+      '<input type="text" data-field="eyebrow" value="' + escHtml(sec.eyebrow || '') + '" placeholder="Aparece em itálico acima do título">' +
     '</div>' +
     '<div class="field">' +
       '<label class="field-label">Título</label>' +
       '<input type="text" data-field="title" value="' + escHtml(sec.title || '') + '">' +
     '</div>' +
     '<div class="field">' +
-      '<label class="field-label">Subtítulo</label>' +
+      '<label class="field-label">Descrição</label>' +
       '<textarea data-field="subtitle" rows="2">' + escHtml(sec.subtitle || '') + '</textarea>' +
     '</div>' +
     '<div class="field">' +
-      '<label class="field-label">Fundo escuro?</label>' +
+      '<label class="field-label">Estilo do fundo</label>' +
       '<select data-field="bgDark">' +
-        '<option value="false"' + (!sec.bgDark ? ' selected' : '') + '>Não — fundo claro</option>' +
-        '<option value="true"' + (sec.bgDark ? ' selected' : '') + '>Sim — fundo escuro</option>' +
+        '<option value="false"' + (!sec.bgDark ? ' selected' : '') + '>Claro (bege)</option>' +
+        '<option value="true"' + (sec.bgDark ? ' selected' : '') + '>Escuro (marrom)</option>' +
       '</select>' +
     '</div>';
 
@@ -1391,10 +1367,10 @@ function createCustomSectionCard(sec, index) {
         '<label class="field-label">Imagem</label>' +
         '<div class="image-input-group">' +
           '<div class="image-input-row">' +
-            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Link da imagem">' +
-            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Cole o link da foto">' +
+            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
           '</div>' +
-          '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive.</div>' +
+          '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
           '<div class="image-preview' + (sec.csImage ? ' visible' : '') + '"><img src="' + escHtml(sec.csImage || '') + '"></div>' +
         '</div>' +
       '</div>';
@@ -1414,10 +1390,10 @@ function createCustomSectionCard(sec, index) {
         '<label class="field-label">Imagem de fundo</label>' +
         '<div class="image-input-group">' +
           '<div class="image-input-row">' +
-            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Link da imagem">' +
-            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Cole o link da foto">' +
+            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
           '</div>' +
-          '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive.</div>' +
+          '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
           '<div class="image-preview' + (sec.csImage ? ' visible' : '') + '"><img src="' + escHtml(sec.csImage || '') + '"></div>' +
         '</div>' +
       '</div>';
@@ -1455,10 +1431,10 @@ function createCustomSectionItem(type, item, secIdx, itemIdx) {
     '<div class="field"><label class="field-label">Imagem</label>' +
       '<div class="image-input-group">' +
         '<div class="image-input-row">' +
-          '<input type="url" data-item-field="image" value="' + escHtml(item.image || '') + '" placeholder="Link da imagem">' +
-          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Google Drive</button>' +
+          '<input type="url" data-item-field="image" value="' + escHtml(item.image || '') + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
         '</div>' +
-        '<div class="gdrive-helper">Cole o link de compartilhamento do Google Drive.</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
         '<div class="image-preview' + (item.image ? ' visible' : '') + '"><img src="' + escHtml(item.image || '') + '"></div>' +
       '</div>' +
     '</div>';
