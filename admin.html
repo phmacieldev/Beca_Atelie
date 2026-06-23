@@ -451,6 +451,7 @@ img { max-width: 100%; display: block; }
     <form id="loginForm">
       <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="email" required>
       <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" required>
+      <input type="text" id="loginKeyword" placeholder="Palavra-chave de acesso" autocomplete="off" style="display:none">
       <button type="submit" class="login-btn" id="loginBtn">Entrar</button>
     </form>
     <p class="login-error" id="loginError"></p>
@@ -892,12 +893,16 @@ function hideLoading() { document.getElementById('loading').classList.remove('ac
 // ─────────────────────────── AUTH ───────────────────────────
 let isSignUp = false;
 
+var SIGNUP_KEYWORD = 'feito-com-amor';
+
 document.getElementById('toggleMode').addEventListener('click', function(e) {
   e.preventDefault();
   isSignUp = !isSignUp;
   document.getElementById('loginBtn').textContent = isSignUp ? 'Criar conta' : 'Entrar';
   document.getElementById('toggleMode').textContent = isSignUp ? 'Já tenho conta' : 'Criar conta';
   document.getElementById('loginToggle').firstChild.textContent = isSignUp ? '' : 'Primeira vez? ';
+  document.getElementById('loginKeyword').style.display = isSignUp ? '' : 'none';
+  document.getElementById('loginKeyword').value = '';
   document.getElementById('loginError').textContent = '';
 });
 
@@ -912,6 +917,15 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   const btn = document.getElementById('loginBtn');
   btn.disabled = true;
   document.getElementById('loginError').textContent = '';
+
+  if (isSignUp) {
+    var keyword = document.getElementById('loginKeyword').value.trim();
+    if (keyword !== SIGNUP_KEYWORD) {
+      document.getElementById('loginError').textContent = 'Palavra-chave incorreta.';
+      btn.disabled = false;
+      return;
+    }
+  }
 
   var action = isSignUp
     ? auth.createUserWithEmailAndPassword(email, pass)
