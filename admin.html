@@ -481,7 +481,7 @@ img { max-width: 100%; display: block; }
     <!-- ════ TAB: Hero ════ -->
     <div class="tab-panel" id="tab-hero">
       <h2 class="tab-panel-title">Seção Hero</h2>
-      <p class="tab-panel-desc">Conteudo principal que aparece ao abrir o site.</p>
+      <p class="tab-panel-desc">Conteúdo principal que aparece ao abrir o site.</p>
 
       <div class="field">
         <label class="field-label">Texto pequeno (eyebrow)</label>
@@ -780,9 +780,9 @@ function showSetupMessage() {
   const el = document.getElementById('setupMessage');
   if (!isConfigured) {
     el.innerHTML = '<div class="setup-msg">' +
-      '<strong>Firebase nao configurado.</strong><br>' +
+      '<strong>Firebase não configurado.</strong><br>' +
       'Para usar o painel, abra o arquivo <code>admin.html</code> e preencha as credenciais do Firebase no objeto <code>firebaseConfig</code>.<br>' +
-      'Consulte o comentario no inicio do script para instrucoes detalhadas.' +
+      'Consulte o comentário no início do script para instruções detalhadas.' +
       '</div>';
   }
 }
@@ -853,7 +853,7 @@ function hideLoading() { document.getElementById('loading').classList.remove('ac
 document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
   if (!isConfigured) {
-    document.getElementById('loginError').textContent = 'Firebase não está configurado. Veja as instrucoes acima.';
+    document.getElementById('loginError').textContent = 'Firebase não está configurado. Veja as instruções acima.';
     return;
   }
   const email = document.getElementById('loginEmail').value;
@@ -869,7 +869,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         msg = 'E-mail ou senha incorretos.';
       } else if (err.code === 'auth/invalid-email') {
-        msg = 'E-mail invalido.';
+        msg = 'E-mail inválido.';
       } else if (err.code === 'auth/too-many-requests') {
         msg = 'Muitas tentativas. Aguarde um momento e tente novamente.';
       }
@@ -1011,7 +1011,7 @@ function createCollectionCard(col, index) {
   div.className = 'card-item';
   div.innerHTML =
     '<div class="card-item-header">' +
-      '<span class="card-item-title">Colecao ' + (index + 1) + '</span>' +
+      '<span class="card-item-title">Coleção ' + (index + 1) + '</span>' +
       '<div class="card-item-actions">' +
         '<button class="card-btn up" onclick="moveCollection(' + index + ',-1)">Subir</button>' +
         '<button class="card-btn down" onclick="moveCollection(' + index + ',1)">Descer</button>' +
@@ -1029,7 +1029,7 @@ function createCollectionCard(col, index) {
       '</div>' +
     '</div>' +
     '<div class="field">' +
-      '<label class="field-label">Descricao</label>' +
+      '<label class="field-label">Descrição</label>' +
       '<input type="text" data-field="description" value="' + escHtml(col.description) + '">' +
     '</div>' +
     '<div class="field">' +
@@ -1113,7 +1113,7 @@ function createCandleCard(candle, index) {
       '</div>' +
     '</div>' +
     '<div class="field">' +
-      '<label class="field-label">Descricao</label>' +
+      '<label class="field-label">Descrição</label>' +
       '<textarea data-field="description" rows="2">' + escHtml(candle.description) + '</textarea>' +
     '</div>' +
     '<div class="field">' +
@@ -1259,10 +1259,10 @@ function removeTickerItem(i) {
 
 // ─── Features / Diferenciais ───
 var iconOptions = [
-  { value: 'hand', label: 'Mao (Feito a mao)' },
+  { value: 'hand', label: 'Mão (Feito à mão)' },
   { value: 'shield', label: 'Escudo (Qualidade)' },
   { value: 'grid', label: 'Grade (Personalizado)' },
-  { value: 'heart', label: 'Coracao (Amor)' },
+  { value: 'heart', label: 'Coração (Amor)' },
   { value: 'star', label: 'Estrela' },
   { value: 'leaf', label: 'Folha (Natural)' },
   { value: 'flame', label: 'Chama (Velas)' }
@@ -1289,7 +1289,7 @@ function renderFeatures() {
         '<span class="card-item-title">Diferencial ' + (i + 1) + '</span>' +
       '</div>' +
       '<div class="field">' +
-        '<label class="field-label">Icone</label>' +
+        '<label class="field-label">Ícone</label>' +
         selectHtml +
       '</div>' +
       '<div class="field">' +
@@ -1340,7 +1340,7 @@ function createCustomSectionCard(sec, index) {
 
   var headerHtml =
     '<div class="card-item-header">' +
-      '<span class="card-item-title">' + (sectionTypeLabels[sec.type] || sec.type) + ' — Secao ' + (index + 1) + '</span>' +
+      '<span class="card-item-title">' + (sectionTypeLabels[sec.type] || sec.type) + ' — Seção ' + (index + 1) + '</span>' +
       '<div class="card-item-actions">' +
         '<button class="card-btn up" onclick="moveCustomSection(' + index + ',-1)">Subir</button>' +
         '<button class="card-btn down" onclick="moveCustomSection(' + index + ',1)">Descer</button>' +
@@ -1364,7 +1364,7 @@ function createCustomSectionCard(sec, index) {
     '<div class="field">' +
       '<label class="field-label">Fundo escuro?</label>' +
       '<select data-field="bgDark">' +
-        '<option value="false"' + (!sec.bgDark ? ' selected' : '') + '>Nao — fundo claro</option>' +
+        '<option value="false"' + (!sec.bgDark ? ' selected' : '') + '>Não — fundo claro</option>' +
         '<option value="true"' + (sec.bgDark ? ' selected' : '') + '>Sim — fundo escuro</option>' +
       '</select>' +
     '</div>';
@@ -1440,10 +1440,10 @@ function createCustomSectionItem(type, item, secIdx, itemIdx) {
       '<div class="fields-row">' +
         '<div class="field"><label class="field-label">Nome</label>' +
           '<input type="text" data-item-field="name" value="' + escHtml(item.name || '') + '"></div>' +
-        '<div class="field"><label class="field-label">Preco</label>' +
+        '<div class="field"><label class="field-label">Preço</label>' +
           '<input type="text" data-item-field="price" value="' + escHtml(item.price || '') + '"></div>' +
       '</div>' +
-      '<div class="field"><label class="field-label">Descricao</label>' +
+      '<div class="field"><label class="field-label">Descrição</label>' +
         '<input type="text" data-item-field="description" value="' + escHtml(item.description || '') + '"></div>';
   } else {
     html +=
