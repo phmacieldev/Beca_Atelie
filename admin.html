@@ -93,6 +93,13 @@ img { max-width: 100%; display: block; }
   color: var(--danger); font-size: .8rem;
   margin-top: 14px; min-height: 20px;
 }
+.login-toggle {
+  margin-top: 18px; font-size: .82rem; color: var(--muted); text-align: center;
+}
+.login-toggle a {
+  color: var(--clay); text-decoration: none; font-weight: 400;
+}
+.login-toggle a:hover { text-decoration: underline; }
 
 /* ─────────────────────────── SETUP MESSAGE ─────────────────────────── */
 .setup-msg {
@@ -447,6 +454,7 @@ img { max-width: 100%; display: block; }
       <button type="submit" class="login-btn" id="loginBtn">Entrar</button>
     </form>
     <p class="login-error" id="loginError"></p>
+    <p class="login-toggle" id="loginToggle">Primeira vez? <a href="#" id="toggleMode">Criar conta</a></p>
   </div>
 </div>
 
@@ -882,6 +890,17 @@ function showLoading() { document.getElementById('loading').classList.add('activ
 function hideLoading() { document.getElementById('loading').classList.remove('active'); }
 
 // ─────────────────────────── AUTH ───────────────────────────
+let isSignUp = false;
+
+document.getElementById('toggleMode').addEventListener('click', function(e) {
+  e.preventDefault();
+  isSignUp = !isSignUp;
+  document.getElementById('loginBtn').textContent = isSignUp ? 'Criar conta' : 'Entrar';
+  document.getElementById('toggleMode').textContent = isSignUp ? 'Já tenho conta' : 'Criar conta';
+  document.getElementById('loginToggle').firstChild.textContent = isSignUp ? '' : 'Primeira vez? ';
+  document.getElementById('loginError').textContent = '';
+});
+
 document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
   if (!isConfigured) {
@@ -894,16 +913,24 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   btn.disabled = true;
   document.getElementById('loginError').textContent = '';
 
-  auth.signInWithEmailAndPassword(email, pass)
+  var action = isSignUp
+    ? auth.createUserWithEmailAndPassword(email, pass)
+    : auth.signInWithEmailAndPassword(email, pass);
+
+  action
     .then(() => { /* onAuthStateChanged handles UI */ })
     .catch(function(err) {
-      let msg = 'Erro ao entrar. Tente novamente.';
+      let msg = 'Erro. Tente novamente.';
       if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         msg = 'E-mail ou senha incorretos.';
       } else if (err.code === 'auth/invalid-email') {
         msg = 'E-mail inválido.';
       } else if (err.code === 'auth/too-many-requests') {
-        msg = 'Muitas tentativas. Aguarde um momento e tente novamente.';
+        msg = 'Muitas tentativas. Aguarde um momento.';
+      } else if (err.code === 'auth/email-already-in-use') {
+        msg = 'Este e-mail já tem conta. Faça login.';
+      } else if (err.code === 'auth/weak-password') {
+        msg = 'Senha muito curta. Use pelo menos 6 caracteres.';
       }
       document.getElementById('loginError').textContent = msg;
       btn.disabled = false;
