@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <circle cx="100" cy="100" r="98" fill="#fff" stroke="#E8DDD0" stroke-width="1"/>
+  <text x="100" y="105" text-anchor="middle" font-family="'Cormorant Garamond', 'Georgia', serif" font-size="52" font-weight="300" letter-spacing="8" fill="#2C2420">BECA</text>
+  <text x="100" y="130" text-anchor="middle" font-family="'Cormorant Garamond', 'Georgia', serif" font-size="20" font-weight="300" letter-spacing="10" fill="#2C2420">ATELIÊ</text>
+</svg>

@@ -6,7 +6,7 @@
 <title>Beca Ateliê — Cerâmica Fria & Velas Artesanais</title>
 <meta name="description" content="Beca Ateliê — peças de cerâmica fria e velas artesanais feitas à mão com amor. Coleções exclusivas para presentear e decorar.">
 <meta name="theme-color" content="#C4784A">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -85,6 +85,7 @@ nav {
 .nav-left a:hover, .nav-right a:hover,
 .nav-left a.active { color: var(--clay); }
 .nav-logo {
+  display: flex; align-items: center; gap: 10px;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.6rem; font-weight: 400; letter-spacing: .06em;
   color: var(--charcoal);
@@ -92,6 +93,7 @@ nav {
   white-space: nowrap;
 }
 .nav-logo em { color: var(--clay); font-style: normal; }
+.nav-logo-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .nav-icon {
   width: 17px; height: 17px;
   stroke: var(--muted); fill: none; stroke-width: 1.5;
@@ -488,9 +490,11 @@ footer {
 .footer-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.5rem; color: var(--charcoal); letter-spacing: .06em;
-  display: block; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
 }
 .footer-logo em { color: var(--clay); font-style: normal; }
+.footer-logo-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .footer-tagline { font-size: .8rem; color: var(--muted); line-height: 1.75; max-width: 230px; }
 .footer-col h4 {
   font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
@@ -748,7 +752,7 @@ function renderNav(d) {
     <li><a href="#colecoes">Coleções</a></li>
     <li><a href="#velas">Velas</a></li>
   </ul>
-  <a href="#home" class="nav-logo">${esc(g.siteName)} <em>${esc(g.siteNameAccent)}</em></a>
+  <a href="#home" class="nav-logo"><img src="logo.svg" alt="Logo" class="nav-logo-img">${esc(g.siteName)} <em>${esc(g.siteNameAccent)}</em></a>
   <div class="nav-right">
     <a href="#sobre">Sobre</a>
     <a href="#contato">Contato</a>
@@ -1015,7 +1019,7 @@ function renderFooter(d) {
 <footer id="contato">
   <div class="footer-grid">
     <div>
-      <a href="#home" class="footer-logo">${esc(g.siteName)} <em>${esc(g.siteNameAccent)}</em></a>
+      <a href="#home" class="footer-logo"><img src="logo.svg" alt="Logo" class="footer-logo-img">${esc(g.siteName)} <em>${esc(g.siteNameAccent)}</em></a>
       <p class="footer-tagline">Cerâmica fria & velas artesanais feitas à mão para eternizar sentimentos e decorar com propósito.</p>
     </div>
     <div class="footer-col">
