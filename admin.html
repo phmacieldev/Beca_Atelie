@@ -724,16 +724,31 @@ img { max-width: 100%; display: block; }
  * 5. Copie as credenciais do projeto (Configurações > Geral > Seus apps)
  * 6. Substitua os valores abaixo pelas suas credenciais
  *
- * Regras do Firestore sugeridas:
+ * Regras do Firestore (copie no Firebase Console > Firestore > Regras):
+ *   → Também disponível no arquivo firestore.rules na raiz do projeto.
+ *
  *   rules_version = '2';
  *   service cloud.firestore {
  *     match /databases/{database}/documents {
  *       match /site/content {
  *         allow read: if true;
- *         allow write: if request.auth != null;
+ *         allow write: if request.auth != null
+ *                      && request.resource.data.keys().hasOnly([
+ *                           'general','hero','ticker','features',
+ *                           'collections','about','candles',
+ *                           'instagramPhotos','customSections'
+ *                         ]);
+ *       }
+ *       match /{document=**} {
+ *         allow read, write: if false;
  *       }
  *     }
  *   }
+ *
+ * Segurança da API Key (opcional mas recomendado):
+ *   → Firebase Console > Configurações > Geral > Chave de API da Web
+ *   → Clique na chave > "Restrições de API" > Adicione restrição de referenciador HTTP
+ *   → Adicione os domínios permitidos (ex: seusite.vercel.app/*, localhost/*)
  *
  * ═══════════════════════════════════════════════════════════════
  */
@@ -893,7 +908,13 @@ function hideLoading() { document.getElementById('loading').classList.remove('ac
 // ─────────────────────────── AUTH ───────────────────────────
 let isSignUp = false;
 
-var SIGNUP_KEYWORD = 'feito-com-amor';
+var SIGNUP_HASH = 'e24540c8b207651575f4b6f6a77918aa2656b10a1354925c85ddd40ecac00ffa';
+
+async function hashText(text) {
+  var encoded = new TextEncoder().encode(text);
+  var buffer = await crypto.subtle.digest('SHA-256', encoded);
+  return Array.from(new Uint8Array(buffer)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
 
 document.getElementById('toggleMode').addEventListener('click', function(e) {
   e.preventDefault();
@@ -906,7 +927,7 @@ document.getElementById('toggleMode').addEventListener('click', function(e) {
   document.getElementById('loginError').textContent = '';
 });
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (!isConfigured) {
     document.getElementById('loginError').textContent = 'Firebase não está configurado. Veja as instruções acima.';
@@ -920,7 +941,8 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
 
   if (isSignUp) {
     var keyword = document.getElementById('loginKeyword').value.trim();
-    if (keyword !== SIGNUP_KEYWORD) {
+    var keywordHash = await hashText(keyword);
+    if (keywordHash !== SIGNUP_HASH) {
       document.getElementById('loginError').textContent = 'Palavra-chave incorreta.';
       btn.disabled = false;
       return;

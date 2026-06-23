@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Só permite leitura/escrita no documento /site/content
+    match /site/content {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.resource.data.keys().hasOnly([
+                        'general','hero','ticker','features',
+                        'collections','about','candles',
+                        'instagramPhotos','customSections'
+                      ]);
+    }
+
+    // Bloqueia qualquer outro documento/coleção
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
