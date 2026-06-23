@@ -133,7 +133,7 @@ img { max-width: 100%; display: block; }
 .topbar-logo em { color: var(--clay); font-style: normal; }
 .topbar-logo span { color: var(--muted); font-family: 'Jost', sans-serif; font-size: .72rem; letter-spacing: .08em; margin-left: 8px; vertical-align: middle; }
 
-/* Tab nav */
+/* Tab nav (desktop) */
 .tab-nav {
   display: flex; gap: 4px; overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -151,6 +151,26 @@ img { max-width: 100%; display: block; }
 }
 .tab-btn:hover { color: var(--text); }
 .tab-btn.active { color: var(--clay); border-bottom-color: var(--clay); }
+
+/* Tab dropdown (mobile) */
+.tab-dropdown {
+  display: none;
+  width: 100%;
+  padding: 12px 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  color: var(--text);
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239C8878' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
 .logout-btn {
   padding: 7px 16px; border: 1px solid var(--border);
   background: none; font-family: 'Jost', sans-serif;
@@ -375,18 +395,33 @@ img { max-width: 100%; display: block; }
 
 /* ─────────────────────────── RESPONSIVE ─────────────────────────── */
 @media (max-width: 700px) {
+  .topbar { padding: 0 16px; }
   .topbar-inner {
     flex-wrap: wrap; height: auto;
-    padding: 12px 0;
+    padding: 12px 0; gap: 10px;
   }
-  .topbar-logo { width: 100%; }
-  .tab-nav { width: 100%; order: 3; }
-  .logout-btn { order: 2; position: absolute; right: 24px; top: 12px; }
+  .topbar-logo { flex: 1; }
+  .tab-nav { display: none; }
+  .tab-dropdown { display: block; width: 100%; order: 3; }
+  .logout-btn { order: 2; flex-shrink: 0; }
   .fields-row { grid-template-columns: 1fr; }
-  .admin-content { padding: 20px 16px 120px; }
-  .save-float { bottom: 16px; right: 16px; }
+  .admin-content { padding: 20px 12px 120px; }
+  .save-float { bottom: 16px; right: 12px; left: 12px; max-width: none; }
   .login-card { padding: 32px 24px; }
   .template-grid { grid-template-columns: 1fr 1fr; }
+  .card-item { padding: 16px; }
+  .card-item-header { flex-wrap: wrap; }
+  .card-item-actions { width: 100%; justify-content: flex-end; }
+  .card-btn { padding: 8px 12px; font-size: .7rem; }
+  .add-btn { width: 100%; justify-content: center; padding: 14px 20px; }
+  .tab-panel-title { font-size: 1.4rem; }
+  .field-label { font-size: .7rem; }
+  .image-input-row { flex-direction: column; }
+  .image-input-row input { width: 100%; }
+  .gdrive-btn { align-self: flex-start; }
+  .ticker-item { flex-direction: column; gap: 8px; }
+  .ticker-item input { width: 100%; }
+  .ticker-item .card-btn { align-self: flex-end; }
 }
 </style>
 </head>
@@ -432,6 +467,17 @@ img { max-width: 100%; display: block; }
         <button class="tab-btn" data-tab="diferenciais">Destaques</button>
         <button class="tab-btn" data-tab="secoes">Extras</button>
       </nav>
+      <select class="tab-dropdown" id="tabDropdown">
+        <option value="geral">Geral</option>
+        <option value="hero">Início</option>
+        <option value="colecoes">Coleções</option>
+        <option value="sobre">Sobre</option>
+        <option value="velas">Velas</option>
+        <option value="instagram">Instagram</option>
+        <option value="ticker">Faixa</option>
+        <option value="diferenciais">Destaques</option>
+        <option value="secoes">Extras</option>
+      </select>
       <button class="logout-btn" id="logoutBtn">Sair</button>
     </div>
   </div>
@@ -882,12 +928,23 @@ if (isConfigured) {
 }
 
 // ─────────────────────────── TAB NAVIGATION ───────────────────────────
-document.getElementById('tabNav').addEventListener('click', function(e) {
-  if (!e.target.classList.contains('tab-btn')) return;
+function switchTab(tabId) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
   document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-  e.target.classList.add('active');
-  document.getElementById('tab-' + e.target.dataset.tab).classList.add('active');
+  var btn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+  document.getElementById('tabDropdown').value = tabId;
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('tabNav').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('tab-btn')) return;
+  switchTab(e.target.dataset.tab);
+});
+
+document.getElementById('tabDropdown').addEventListener('change', function() {
+  switchTab(this.value);
 });
 
 // ─────────────────────────── RENDER FORMS ───────────────────────────
