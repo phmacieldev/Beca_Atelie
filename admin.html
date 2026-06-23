@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beca Ateliê — Painel Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9998;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase Compat SDK v10 -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+/* ─────────────────────────── RESET & TOKENS ─────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream:      #F7F2EC;
+  --warm-white: #FDFAF6;
+  --clay:       #C4784A;
+  --clay-light: #D9956A;
+  --clay-dark:  #9E5A30;
+  --linen:      #E8DDD0;
+  --charcoal:   #2C2420;
+  --text:       #3D2E26;
+  --muted:      #9C8878;
+  --border:     #DDD0C4;
+  --danger:     #C0392B;
+  --danger-light: #FADBD8;
+  --success:    #27AE60;
+  --radius:     4px;
+}
+html { font-size: 16px; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--warm-white);
+  color: var(--text);
+  font-weight: 300;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+/* ─────────────────────────── LOGIN SCREEN ─────────────────────────── */
+.login-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+  background: linear-gradient(135deg, var(--cream) 0%, var(--warm-white) 50%, var(--linen) 100%);
+}
+.login-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 48px 40px;
+  width: 100%; max-width: 400px;
+  text-align: center;
+}
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 400; letter-spacing: .06em;
+  color: var(--charcoal); margin-bottom: 6px;
+}
+.login-logo em { color: var(--clay); font-style: normal; }
+.login-sub {
+  font-size: .78rem; color: var(--muted); margin-bottom: 32px;
+  letter-spacing: .04em;
+}
+.login-card input {
+  width: 100%; padding: 12px 16px;
+  border: 1px solid var(--border);
+  background: var(--warm-white);
+  font-family: 'Jost', sans-serif;
+  font-size: .88rem; color: var(--text);
+  margin-bottom: 14px;
+  outline: none; transition: border-color .2s;
+}
+.login-card input:focus { border-color: var(--clay); }
+.login-card input::placeholder { color: var(--muted); }
+.login-btn {
+  width: 100%; padding: 14px;
+  background: var(--clay); color: #fff; border: none;
+  font-family: 'Jost', sans-serif;
+  font-size: .78rem; font-weight: 400;
+  letter-spacing: .13em; text-transform: uppercase;
+  cursor: pointer; transition: background .25s;
+  margin-top: 6px;
+}
+.login-btn:hover { background: var(--clay-dark); }
+.login-btn:disabled { opacity: .6; cursor: not-allowed; }
+.login-error {
+  color: var(--danger); font-size: .8rem;
+  margin-top: 14px; min-height: 20px;
+}
+
+/* ─────────────────────────── SETUP MESSAGE ─────────────────────────── */
+.setup-msg {
+  background: #FFF3E0; border: 1px solid #FFB74D;
+  padding: 20px 24px; margin-bottom: 0;
+  font-size: .85rem; line-height: 1.7; color: #5D4037;
+}
+.setup-msg strong { color: var(--clay-dark); }
+.setup-msg code {
+  background: rgba(0,0,0,.06); padding: 2px 6px;
+  font-size: .8rem; border-radius: 2px;
+}
+
+/* ─────────────────────────── ADMIN SHELL ─────────────────────────── */
+.admin-shell { display: none; min-height: 100vh; }
+.admin-shell.active { display: block; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(253,250,246,.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+.topbar-inner {
+  display: flex; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+  height: 56px; gap: 24px;
+}
+.topbar-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; color: var(--charcoal);
+  letter-spacing: .04em; white-space: nowrap;
+  flex-shrink: 0;
+}
+.topbar-logo em { color: var(--clay); font-style: normal; }
+.topbar-logo span { color: var(--muted); font-family: 'Jost', sans-serif; font-size: .72rem; letter-spacing: .08em; margin-left: 8px; vertical-align: middle; }
+
+/* Tab nav (desktop) */
+.tab-nav {
+  display: flex; gap: 4px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; flex: 1;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 8px 14px; border: none; background: none;
+  font-family: 'Jost', sans-serif;
+  font-size: .72rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--clay); border-bottom-color: var(--clay); }
+
+/* Tab dropdown (mobile) */
+.tab-dropdown {
+  display: none;
+  width: 100%;
+  padding: 12px 16px;
+  font-family: 'Jost', sans-serif;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  color: var(--text);
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239C8878' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+.logout-btn {
+  padding: 7px 16px; border: 1px solid var(--border);
+  background: none; font-family: 'Jost', sans-serif;
+  font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: border-color .2s, color .2s;
+}
+.logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+/* Main content */
+.admin-content {
+  max-width: 800px; margin: 0 auto;
+  padding: 32px 24px 120px;
+}
+
+/* Tab panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.tab-panel-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 400;
+  color: var(--charcoal); margin-bottom: 8px;
+}
+.tab-panel-desc {
+  font-size: .82rem; color: var(--muted);
+  margin-bottom: 32px; line-height: 1.6;
+}
+
+/* ─────────────────────────── FORM ELEMENTS ─────────────────────────── */
+.field { margin-bottom: 22px; }
+.field-label {
+  display: block; font-size: .72rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px; font-weight: 400;
+}
+.field-hint {
+  font-size: .75rem; color: var(--muted);
+  margin-top: 4px; font-style: italic;
+  opacity: .7;
+}
+.field input[type="text"],
+.field input[type="url"],
+.field input[type="number"],
+.field textarea,
+.field select {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-family: 'Jost', sans-serif;
+  font-size: .88rem; color: var(--text);
+  outline: none; transition: border-color .2s;
+  font-weight: 300;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus { border-color: var(--clay); }
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.field select { cursor: pointer; appearance: auto; }
+
+/* Image input group */
+.image-input-group { position: relative; }
+.image-input-row { display: flex; gap: 8px; align-items: center; }
+.image-input-row input { flex: 1; }
+.gdrive-btn {
+  padding: 8px 12px; border: 1px solid var(--border);
+  background: var(--cream); color: var(--muted);
+  font-family: 'Jost', sans-serif;
+  font-size: .68rem; letter-spacing: .06em;
+  cursor: pointer; white-space: nowrap;
+  transition: border-color .2s, color .2s;
+}
+.gdrive-btn:hover { border-color: var(--clay); color: var(--clay); }
+.gdrive-helper {
+  display: none; margin-top: 8px;
+  padding: 12px 14px;
+  background: #FFF8E1; border: 1px solid #FFE082;
+  font-size: .78rem; line-height: 1.65; color: #5D4037;
+}
+.gdrive-helper.visible { display: block; }
+.image-preview {
+  margin-top: 10px;
+  max-height: 180px; overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  display: none;
+}
+.image-preview.visible { display: block; }
+.image-preview img {
+  width: 100%; max-height: 180px;
+  object-fit: contain;
+}
+
+/* ─────────────────────────── CARD LISTS ─────────────────────────── */
+.card-item {
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 16px;
+  background: #fff;
+  position: relative;
+}
+.card-item-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 10px;
+}
+.card-item-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; color: var(--charcoal);
+}
+.card-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.card-btn {
+  padding: 5px 10px; border: 1px solid var(--border);
+  background: none; font-family: 'Jost', sans-serif;
+  font-size: .65rem; letter-spacing: .06em;
+  text-transform: uppercase; cursor: pointer;
+  transition: all .2s; color: var(--muted);
+}
+.card-btn:hover { border-color: var(--clay); color: var(--clay); }
+.card-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+.card-btn.up::before { content: '\2191 '; }
+.card-btn.down::before { content: '\2193 '; }
+
+/* Add button */
+.add-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border: 1px dashed var(--border);
+  background: none; font-family: 'Jost', sans-serif;
+  font-size: .75rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+  cursor: pointer; transition: all .2s;
+  margin-top: 8px;
+}
+.add-btn:hover { border-color: var(--clay); color: var(--clay); background: var(--cream); }
+.add-btn::before { content: '+'; font-size: 1rem; line-height: 1; }
+
+/* ─────────────────────────── SECTION FIELDS ROW ─────────────────────────── */
+.fields-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ─────────────────────────── FLOATING SAVE ─────────────────────────── */
+.save-float {
+  position: fixed; bottom: 28px; right: 28px;
+  z-index: 100;
+}
+.save-btn {
+  padding: 14px 32px;
+  background: var(--clay); color: #fff; border: none;
+  font-family: 'Jost', sans-serif;
+  font-size: .78rem; font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; transition: background .25s, transform .2s;
+  box-shadow: 0 4px 20px rgba(196,120,74,.35);
+}
+.save-btn:hover { background: var(--clay-dark); transform: translateY(-2px); }
+.save-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ─────────────────────────── TOAST ─────────────────────────── */
+.toast-container {
+  position: fixed; top: 72px; right: 24px;
+  z-index: 200; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  padding: 12px 20px;
+  font-size: .82rem; color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  animation: toastIn .3s ease;
+  max-width: 340px;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─────────────────────────── LOADING OVERLAY ─────────────────────────── */
+.loading-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(253,250,246,.85);
+  display: none; align-items: center; justify-content: center;
+}
+.loading-overlay.active { display: flex; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--clay);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─────────────────────────── CUSTOM SECTION TEMPLATES ─────────────────────────── */
+.template-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.template-card {
+  border: 1px solid var(--border);
+  padding: 20px 16px; text-align: center;
+  cursor: pointer; transition: all .2s;
+  background: #fff;
+}
+.template-card:hover { border-color: var(--clay); background: var(--cream); }
+.template-card-icon {
+  font-size: 1.6rem; margin-bottom: 8px;
+  color: var(--clay);
+}
+.template-card-name {
+  font-size: .78rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text);
+}
+
+/* ─────────────────────────── TICKER LIST ─────────────────────────── */
+.ticker-item {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 8px;
+}
+.ticker-item input { flex: 1; }
+.ticker-item .card-btn { flex-shrink: 0; }
+
+/* ─────────────────────────── RESPONSIVE ─────────────────────────── */
+@media (max-width: 700px) {
+  .topbar { padding: 0 16px; }
+  .topbar-inner {
+    flex-wrap: wrap; height: auto;
+    padding: 12px 0; gap: 10px;
+  }
+  .topbar-logo { flex: 1; }
+  .tab-nav { display: none; }
+  .tab-dropdown { display: block; width: 100%; order: 3; }
+  .logout-btn { order: 2; flex-shrink: 0; }
+  .fields-row { grid-template-columns: 1fr; }
+  .admin-content { padding: 20px 12px 120px; }
+  .save-float { bottom: 16px; right: 12px; left: 12px; max-width: none; }
+  .login-card { padding: 32px 24px; }
+  .template-grid { grid-template-columns: 1fr 1fr; }
+  .card-item { padding: 16px; }
+  .card-item-header { flex-wrap: wrap; }
+  .card-item-actions { width: 100%; justify-content: flex-end; }
+  .card-btn { padding: 8px 12px; font-size: .7rem; }
+  .add-btn { width: 100%; justify-content: center; padding: 14px 20px; }
+  .tab-panel-title { font-size: 1.4rem; }
+  .field-label { font-size: .7rem; }
+  .image-input-row { flex-direction: column; }
+  .image-input-row input { width: 100%; }
+  .gdrive-btn { align-self: flex-start; }
+  .ticker-item { flex-direction: column; gap: 8px; }
+  .ticker-item input { width: 100%; }
+  .ticker-item .card-btn { align-self: flex-end; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ LOADING OVERLAY ════════════ -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- ════════════ TOAST CONTAINER ════════════ -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- ════════════ LOGIN SCREEN ════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">Beca <em>Ateliê</em></div>
+    <p class="login-sub">Painel de administração</p>
+    <div id="setupMessage"></div>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="email" required>
+      <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" required>
+      <button type="submit" class="login-btn" id="loginBtn">Entrar</button>
+    </form>
+    <p class="login-error" id="loginError"></p>
+  </div>
+</div>
+
+<!-- ════════════ ADMIN SHELL ════════════ -->
+<div class="admin-shell" id="adminShell">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-logo">Beca <em>Ateliê</em> <span>Painel</span></div>
+      <nav class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="geral">Geral</button>
+        <button class="tab-btn" data-tab="hero">Início</button>
+        <button class="tab-btn" data-tab="colecoes">Coleções</button>
+        <button class="tab-btn" data-tab="sobre">Sobre</button>
+        <button class="tab-btn" data-tab="velas">Velas</button>
+        <button class="tab-btn" data-tab="instagram">Instagram</button>
+        <button class="tab-btn" data-tab="ticker">Faixa</button>
+        <button class="tab-btn" data-tab="diferenciais">Destaques</button>
+        <button class="tab-btn" data-tab="secoes">Extras</button>
+      </nav>
+      <select class="tab-dropdown" id="tabDropdown">
+        <option value="geral">Geral</option>
+        <option value="hero">Início</option>
+        <option value="colecoes">Coleções</option>
+        <option value="sobre">Sobre</option>
+        <option value="velas">Velas</option>
+        <option value="instagram">Instagram</option>
+        <option value="ticker">Faixa</option>
+        <option value="diferenciais">Destaques</option>
+        <option value="secoes">Extras</option>
+      </select>
+      <button class="logout-btn" id="logoutBtn">Sair</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="admin-content" id="adminContent">
+
+    <!-- ════ TAB: Geral ════ -->
+    <div class="tab-panel active" id="tab-geral">
+      <h2 class="tab-panel-title">Configurações Gerais</h2>
+      <p class="tab-panel-desc">Nome do site, redes sociais e informações de contato.</p>
+
+      <div class="fields-row">
+        <div class="field">
+          <label class="field-label">Nome do site</label>
+          <input type="text" id="gen-siteName" placeholder="Beca">
+        </div>
+        <div class="field">
+          <label class="field-label">Nome (destaque)</label>
+          <input type="text" id="gen-siteNameAccent" placeholder="Ateliê">
+        </div>
+      </div>
+
+      <div class="fields-row">
+        <div class="field">
+          <label class="field-label">Instagram (@)</label>
+          <input type="text" id="gen-instagram" placeholder="@beca.atelie_">
+        </div>
+        <div class="field">
+          <label class="field-label">Instagram URL</label>
+          <input type="url" id="gen-instagramUrl" placeholder="https://instagram.com/beca.atelie_">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">WhatsApp</label>
+        <input type="text" id="gen-whatsapp" placeholder="5522999409724">
+        <p class="field-hint">Apenas números, com DDD. Ex: 5522999409724</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Mensagem automática do WhatsApp</label>
+        <textarea id="gen-whatsappMsg" placeholder="Olá! Gostaria de fazer uma encomenda no Beca Ateliê."></textarea>
+      </div>
+    </div>
+
+    <!-- ════ TAB: Hero ════ -->
+    <div class="tab-panel" id="tab-hero">
+      <h2 class="tab-panel-title">Página Inicial</h2>
+      <p class="tab-panel-desc">O que aparece primeiro quando alguém abre o site.</p>
+
+      <div class="field">
+        <label class="field-label">Frase de destaque</label>
+        <input type="text" id="hero-eyebrow" placeholder="cerâmica fria & velas artesanais">
+        <p class="field-hint">Aparece em itálico acima do título.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Título</label>
+        <textarea id="hero-title" rows="3" placeholder="Detalhes feitos&#10;com amor,&#10;cuidado e tempo."></textarea>
+        <p class="field-hint">Quebre a linha normalmente com Enter.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Descrição curta</label>
+        <textarea id="hero-subtitle" rows="3" placeholder="Cada peça nasce das mãos com intenção..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Foto principal</label>
+        <div class="image-input-group" data-target="hero-image">
+          <div class="image-input-row">
+            <input type="url" id="hero-image" placeholder="Cole o link da foto (Google Drive ou outro)">
+            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>
+          </div>
+          <div class="gdrive-helper">
+            <strong>Como usar fotos do Google Drive:</strong><br>
+            1. Abra a foto no Google Drive<br>
+            2. Clique em "Compartilhar" e copie o link<br>
+            3. Cole o link no campo acima<br>
+            Pronto! O sistema ajusta o link sozinho.
+          </div>
+          <div class="image-preview" id="preview-hero-image"><img></div>
+        </div>
+      </div>
+
+      <div class="fields-row">
+        <div class="field">
+          <label class="field-label">Texto do primeiro botão</label>
+          <input type="text" id="hero-cta1Text" placeholder="Ver coleções">
+        </div>
+        <div class="field">
+          <label class="field-label">Texto do segundo botão</label>
+          <input type="text" id="hero-cta2Text" placeholder="Fazer encomenda">
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: Coleções ════ -->
+    <div class="tab-panel" id="tab-colecoes">
+      <h2 class="tab-panel-title">Coleções</h2>
+      <p class="tab-panel-desc">Adicione, remova e reordene suas coleções de produtos.</p>
+      <div id="collections-list"></div>
+      <button type="button" class="add-btn" onclick="addCollection()">Adicionar coleção</button>
+    </div>
+
+    <!-- ════ TAB: Sobre ════ -->
+    <div class="tab-panel" id="tab-sobre">
+      <h2 class="tab-panel-title">Sobre o Ateliê</h2>
+      <p class="tab-panel-desc">Conte sua história para quem visitar o site.</p>
+
+      <div class="field">
+        <label class="field-label">Frase de destaque</label>
+        <input type="text" id="about-eyebrow" placeholder="sobre o ateliê">
+        <p class="field-hint">Aparece em itálico acima do título.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Título</label>
+        <textarea id="about-title" rows="2" placeholder="Mais que peças,&#10;criamos significados."></textarea>
+        <p class="field-hint">Quebre a linha normalmente com Enter.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Sua história</label>
+        <textarea id="about-text" rows="5" placeholder="Conte a história do seu ateliê..."></textarea>
+        <p class="field-hint">Pule uma linha para separar parágrafos.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Texto do botão</label>
+        <input type="text" id="about-buttonText" placeholder="Conheça nossa história">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Sua foto</label>
+        <div class="image-input-group" data-target="about-image">
+          <div class="image-input-row">
+            <input type="url" id="about-image" placeholder="Cole o link da foto (Google Drive ou outro)">
+            <button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>
+          </div>
+          <div class="gdrive-helper">
+            <strong>Como usar fotos do Google Drive:</strong><br>
+            1. Abra a foto no Google Drive<br>
+            2. Clique em "Compartilhar" e copie o link<br>
+            3. Cole o link no campo acima<br>
+            Pronto! O sistema ajusta o link sozinho.
+          </div>
+          <div class="image-preview" id="preview-about-image"><img></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: Velas ════ -->
+    <div class="tab-panel" id="tab-velas">
+      <h2 class="tab-panel-title">Velas Artesanais</h2>
+      <p class="tab-panel-desc">Adicione, remova e reordene suas velas.</p>
+      <div id="candles-list"></div>
+      <button type="button" class="add-btn" onclick="addCandle()">Adicionar vela</button>
+    </div>
+
+    <!-- ════ TAB: Instagram ════ -->
+    <div class="tab-panel" id="tab-instagram">
+      <h2 class="tab-panel-title">Fotos do Instagram</h2>
+      <p class="tab-panel-desc">Fotos que aparecem na seção do Instagram no site.</p>
+      <div id="instagram-list"></div>
+      <button type="button" class="add-btn" onclick="addInstagramPhoto()">Adicionar foto</button>
+    </div>
+
+    <!-- ════ TAB: Ticker ════ -->
+    <div class="tab-panel" id="tab-ticker">
+      <h2 class="tab-panel-title">Faixa Animada</h2>
+      <p class="tab-panel-desc">Palavras que passam na faixa colorida abaixo da foto principal.</p>
+      <div id="ticker-list"></div>
+      <button type="button" class="add-btn" onclick="addTickerItem()">Adicionar texto</button>
+    </div>
+
+    <!-- ════ TAB: Diferenciais ════ -->
+    <div class="tab-panel" id="tab-diferenciais">
+      <h2 class="tab-panel-title">Destaques da Marca</h2>
+      <p class="tab-panel-desc">Os 4 diferenciais que aparecem logo abaixo da faixa animada.</p>
+      <div id="features-list"></div>
+    </div>
+
+    <!-- ════ TAB: Seções+ ════ -->
+    <div class="tab-panel" id="tab-secoes">
+      <h2 class="tab-panel-title">Seções Extras</h2>
+      <p class="tab-panel-desc">Adicione novas seções ao site. Escolha um modelo e preencha o conteúdo.</p>
+
+      <div class="template-grid" id="templateGrid">
+        <div class="template-card" onclick="addCustomSection('gallery')">
+          <div class="template-card-icon">&#9638;&#9638;&#9638;</div>
+          <div class="template-card-name">Galeria</div>
+        </div>
+        <div class="template-card" onclick="addCustomSection('products')">
+          <div class="template-card-icon">&#9733;</div>
+          <div class="template-card-name">Produtos</div>
+        </div>
+        <div class="template-card" onclick="addCustomSection('textimage')">
+          <div class="template-card-icon">&#9776;</div>
+          <div class="template-card-name">Texto e Imagem</div>
+        </div>
+        <div class="template-card" onclick="addCustomSection('banner')">
+          <div class="template-card-icon">&#9644;</div>
+          <div class="template-card-name">Banner</div>
+        </div>
+      </div>
+
+      <div id="custom-sections-list"></div>
+    </div>
+
+  </div>
+
+  <!-- Floating save -->
+  <div class="save-float">
+    <button class="save-btn" id="saveBtn" onclick="saveAll()">Publicar alterações</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════════════════════════════════════ -->
+<script>
+/*
+ * ═══════════════════════════════════════════════════════════════
+ * CONFIGURACAO DO FIREBASE
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * Para configurar o painel administrativo:
+ *
+ * 1. Crie um projeto no Firebase Console (https://console.firebase.google.com)
+ * 2. Ative o Firestore Database (modo produção)
+ * 3. Ative Authentication > Email/Password
+ * 4. Crie um usuario em Authentication > Users
+ * 5. Copie as credenciais do projeto (Configurações > Geral > Seus apps)
+ * 6. Substitua os valores abaixo pelas suas credenciais
+ *
+ * Regras do Firestore sugeridas:
+ *   rules_version = '2';
+ *   service cloud.firestore {
+ *     match /databases/{database}/documents {
+ *       match /site/content {
+ *         allow read: if true;
+ *         allow write: if request.auth != null;
+ *       }
+ *     }
+ *   }
+ *
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJETO",
+  storageBucket: "SEU_PROJETO.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
+
+// ─── Check if Firebase is configured ───
+const isConfigured = firebaseConfig.apiKey !== 'SUA_API_KEY';
+
+let db, auth;
+if (isConfigured) {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+}
+
+// ─────────────────────────── STATE ───────────────────────────
+let siteData = getDefaults();
+
+function getDefaults() {
+  return {
+    general: {
+      siteName: 'Beca',
+      siteNameAccent: 'Ateliê',
+      instagram: '@beca.atelie_',
+      instagramUrl: 'https://www.instagram.com/beca.atelie_?igsh=cmlvcDVmNzNrNHhs',
+      whatsapp: '5522999409724',
+      whatsappMsg: 'Olá! Gostaria de fazer uma encomenda no Beca Ateliê.'
+    },
+    hero: {
+      eyebrow: 'cerâmica fria & velas artesanais',
+      title: 'Detalhes feitos<br>com amor,<br>cuidado e tempo.',
+      subtitle: 'Cada peça nasce das mãos com intenção — para guardar memórias, marcar momentos e encher de beleza os espaços que amamos.',
+      image: '',
+      cta1Text: 'Ver coleções',
+      cta1Link: '#colecoes',
+      cta2Text: 'Fazer encomenda',
+      cta2Link: '#contato'
+    },
+    ticker: ['Feito à mão', 'Cerâmica fria', 'Velas artesanais', 'Com amor', 'Momentos únicos', 'Personalizado'],
+    features: [
+      { icon: 'hand', title: 'Feito à mão', text: 'Cada peça é modelada com cuidado e dedicação, única em sua essência.' },
+      { icon: 'shield', title: 'Materiais de qualidade', text: 'Cerâmica fria de alta qualidade, durável e delicada. Velas com aromas naturais.' },
+      { icon: 'grid', title: 'Personalizados', text: 'Peças exclusivas para momentos inesquecíveis e presentes com significado.' },
+      { icon: 'heart', title: 'Com amor', text: 'Criadas para transmitir afeto e guardar boas lembranças para sempre.' }
+    ],
+    collections: [
+      { name: 'Fé', description: 'Mensagens que fortalecem a alma.', image: '', link: '#' },
+      { name: 'Afeto', description: 'Homenagens que abraçam o coração.', image: '', link: '#' },
+      { name: 'Família', description: 'Memórias que nunca se esquecem.', image: '', link: '#' },
+      { name: 'Memórias', description: 'Detalhes que guardam grandes histórias.', image: '', link: '#' },
+      { name: 'Florescer', description: 'Beleza, delicadeza e inspiração.', image: '', link: '#' }
+    ],
+    about: {
+      eyebrow: 'sobre o ateliê',
+      title: 'Mais que peças,<br>criamos significados.',
+      text: 'O Beca Ateliê nasceu do desejo de transformar sentimentos em forma — em cerâmica fria delicada, em velas que preenchem o ar com aroma e aconchego. Cada criação carrega histórias, amor e intenção.<br><br>Tudo feito à mão, com calma e cuidado. Porque acreditamos que os detalhes fazem toda a diferença.',
+      buttonText: 'Conheça nossa história',
+      buttonLink: '#contato',
+      image: ''
+    },
+    candles: [
+      { name: 'Lavanda & Baunilha', description: 'Aroma suave e acolhedor para relaxar e trazer paz ao ambiente.', tag: 'Aromaterapia', image: '' },
+      { name: 'Rosa & Sândalo', description: 'Sofisticado e floral, perfeito para presentear com elegância.', tag: 'Presente ideal', image: '' },
+      { name: 'Personalizada', description: 'Escolha o aroma, o recipiente e a mensagem. Feita especialmente para você.', tag: 'Encomenda', image: '' }
+    ],
+    instagramPhotos: [
+      { image: '' }, { image: '' }, { image: '' }, { image: '' },
+      { image: '' }, { image: '' }, { image: '' }
+    ],
+    customSections: []
+  };
+}
+
+// ─────────────────────────── SETUP MESSAGE ───────────────────────────
+function showSetupMessage() {
+  const el = document.getElementById('setupMessage');
+  if (!isConfigured) {
+    el.innerHTML = '<div class="setup-msg">' +
+      '<strong>Firebase não configurado.</strong><br>' +
+      'Para usar o painel, abra o arquivo <code>admin.html</code> e preencha as credenciais do Firebase no objeto <code>firebaseConfig</code>.<br>' +
+      'Consulte o comentário no início do script para instruções detalhadas.' +
+      '</div>';
+  }
+}
+showSetupMessage();
+
+// ─────────────────────────── GOOGLE DRIVE HELPER ───────────────────────────
+function convertDriveUrl(url) {
+  if (!url) return '';
+  url = url.trim();
+
+  // Pattern: /file/d/{ID}/
+  let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1000';
+
+  // Pattern: open?id={ID}
+  match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (match) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w1000';
+
+  // Already a direct URL or other format, pass through
+  return url;
+}
+
+function isDriveUrl(url) {
+  return url && url.includes('drive.google.com');
+}
+
+function toggleDriveHelper(btn) {
+  const helper = btn.closest('.image-input-group').querySelector('.gdrive-helper');
+  helper.classList.toggle('visible');
+}
+
+function setupImageInput(inputEl) {
+  const processUrl = () => {
+    let val = inputEl.value.trim();
+    if (isDriveUrl(val)) {
+      val = convertDriveUrl(val);
+      inputEl.value = val;
+    }
+    const previewEl = inputEl.closest('.image-input-group').querySelector('.image-preview');
+    if (val) {
+      previewEl.querySelector('img').src = val;
+      previewEl.classList.add('visible');
+    } else {
+      previewEl.classList.remove('visible');
+    }
+  };
+  inputEl.addEventListener('input', processUrl);
+  inputEl.addEventListener('change', processUrl);
+  inputEl.addEventListener('paste', () => setTimeout(processUrl, 50));
+}
+
+// ─────────────────────────── TOAST ───────────────────────────
+function showToast(msg, type) {
+  type = type || 'success';
+  const container = document.getElementById('toasts');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3500);
+}
+
+// ─────────────────────────── LOADING ───────────────────────────
+function showLoading() { document.getElementById('loading').classList.add('active'); }
+function hideLoading() { document.getElementById('loading').classList.remove('active'); }
+
+// ─────────────────────────── AUTH ───────────────────────────
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (!isConfigured) {
+    document.getElementById('loginError').textContent = 'Firebase não está configurado. Veja as instruções acima.';
+    return;
+  }
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  document.getElementById('loginError').textContent = '';
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(() => { /* onAuthStateChanged handles UI */ })
+    .catch(function(err) {
+      let msg = 'Erro ao entrar. Tente novamente.';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        msg = 'E-mail ou senha incorretos.';
+      } else if (err.code === 'auth/invalid-email') {
+        msg = 'E-mail inválido.';
+      } else if (err.code === 'auth/too-many-requests') {
+        msg = 'Muitas tentativas. Aguarde um momento e tente novamente.';
+      }
+      document.getElementById('loginError').textContent = msg;
+      btn.disabled = false;
+    });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  if (isConfigured) auth.signOut();
+});
+
+if (isConfigured) {
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminShell').classList.add('active');
+      loadData();
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminShell').classList.remove('active');
+      document.getElementById('loginBtn').disabled = false;
+    }
+  });
+}
+
+// ─────────────────────────── TAB NAVIGATION ───────────────────────────
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var btn = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+  if (btn) btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+  document.getElementById('tabDropdown').value = tabId;
+  window.scrollTo(0, 0);
+}
+
+document.getElementById('tabNav').addEventListener('click', function(e) {
+  if (!e.target.classList.contains('tab-btn')) return;
+  switchTab(e.target.dataset.tab);
+});
+
+document.getElementById('tabDropdown').addEventListener('change', function() {
+  switchTab(this.value);
+});
+
+// ─────────────────────────── RENDER FORMS ───────────────────────────
+
+// Geral
+function renderGeral() {
+  var g = siteData.general;
+  document.getElementById('gen-siteName').value = g.siteName || '';
+  document.getElementById('gen-siteNameAccent').value = g.siteNameAccent || '';
+  document.getElementById('gen-instagram').value = g.instagram || '';
+  document.getElementById('gen-instagramUrl').value = g.instagramUrl || '';
+  document.getElementById('gen-whatsapp').value = g.whatsapp || '';
+  document.getElementById('gen-whatsappMsg').value = g.whatsappMsg || '';
+}
+
+function collectGeral() {
+  siteData.general = {
+    siteName: document.getElementById('gen-siteName').value,
+    siteNameAccent: document.getElementById('gen-siteNameAccent').value,
+    instagram: document.getElementById('gen-instagram').value,
+    instagramUrl: document.getElementById('gen-instagramUrl').value,
+    whatsapp: document.getElementById('gen-whatsapp').value,
+    whatsappMsg: document.getElementById('gen-whatsappMsg').value
+  };
+}
+
+// Hero
+function renderHero() {
+  var h = siteData.hero;
+  document.getElementById('hero-eyebrow').value = h.eyebrow || '';
+  document.getElementById('hero-title').value = (h.title || '').replace(/<br\s*\/?>/gi, '\n');
+  document.getElementById('hero-subtitle').value = h.subtitle || '';
+  document.getElementById('hero-image').value = h.image || '';
+  document.getElementById('hero-cta1Text').value = h.cta1Text || '';
+  document.getElementById('hero-cta2Text').value = h.cta2Text || '';
+  updateImagePreview('hero-image');
+}
+
+function collectHero() {
+  siteData.hero = {
+    eyebrow: document.getElementById('hero-eyebrow').value,
+    title: document.getElementById('hero-title').value.replace(/\n/g, '<br>'),
+    subtitle: document.getElementById('hero-subtitle').value,
+    image: document.getElementById('hero-image').value,
+    cta1Text: document.getElementById('hero-cta1Text').value,
+    cta1Link: '#colecoes',
+    cta2Text: document.getElementById('hero-cta2Text').value,
+    cta2Link: '#contato'
+  };
+}
+
+// About
+function renderAbout() {
+  var a = siteData.about;
+  document.getElementById('about-eyebrow').value = a.eyebrow || '';
+  document.getElementById('about-title').value = (a.title || '').replace(/<br\s*\/?>/gi, '\n');
+  document.getElementById('about-text').value = (a.text || '').replace(/<br\s*\/?>/gi, '\n');
+  document.getElementById('about-buttonText').value = a.buttonText || '';
+  document.getElementById('about-image').value = a.image || '';
+  updateImagePreview('about-image');
+}
+
+function collectAbout() {
+  siteData.about = {
+    eyebrow: document.getElementById('about-eyebrow').value,
+    title: document.getElementById('about-title').value.replace(/\n/g, '<br>'),
+    text: document.getElementById('about-text').value.replace(/\n/g, '<br>'),
+    buttonText: document.getElementById('about-buttonText').value,
+    buttonLink: '#contato',
+    image: document.getElementById('about-image').value
+  };
+}
+
+// Utility: update an image preview by input ID
+function updateImagePreview(inputId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  var group = input.closest('.image-input-group');
+  if (!group) return;
+  var preview = group.querySelector('.image-preview');
+  if (!preview) return;
+  var val = input.value.trim();
+  if (val) {
+    preview.querySelector('img').src = val;
+    preview.classList.add('visible');
+  } else {
+    preview.classList.remove('visible');
+  }
+}
+
+// ─── Collections ───
+function renderCollections() {
+  var list = document.getElementById('collections-list');
+  list.innerHTML = '';
+  siteData.collections.forEach(function(col, i) {
+    list.appendChild(createCollectionCard(col, i));
+  });
+  list.querySelectorAll('.image-input-group input[type="url"]').forEach(setupImageInput);
+}
+
+function createCollectionCard(col, index) {
+  var div = document.createElement('div');
+  div.className = 'card-item';
+  div.innerHTML =
+    '<div class="card-item-header">' +
+      '<span class="card-item-title">Coleção ' + (index + 1) + '</span>' +
+      '<div class="card-item-actions">' +
+        '<button class="card-btn up" onclick="moveCollection(' + index + ',-1)">Subir</button>' +
+        '<button class="card-btn down" onclick="moveCollection(' + index + ',1)">Descer</button>' +
+        '<button class="card-btn danger" onclick="removeCollection(' + index + ')">Remover</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Nome</label>' +
+      '<input type="text" data-field="name" value="' + escHtml(col.name) + '">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Descrição curta</label>' +
+      '<input type="text" data-field="description" value="' + escHtml(col.description) + '">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Imagem</label>' +
+      '<div class="image-input-group">' +
+        '<div class="image-input-row">' +
+          '<input type="url" data-field="image" value="' + escHtml(col.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+        '</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
+        '<div class="image-preview' + (col.image ? ' visible' : '') + '"><img src="' + escHtml(col.image) + '"></div>' +
+      '</div>' +
+    '</div>';
+  return div;
+}
+
+function collectCollections() {
+  var cards = document.querySelectorAll('#collections-list .card-item');
+  siteData.collections = [];
+  cards.forEach(function(card) {
+    siteData.collections.push({
+      name: card.querySelector('[data-field="name"]').value,
+      description: card.querySelector('[data-field="description"]').value,
+      image: card.querySelector('[data-field="image"]').value,
+      link: '#'
+    });
+  });
+}
+
+function addCollection() {
+  collectCollections();
+  siteData.collections.push({ name: '', description: '', image: '', link: '#' });
+  renderCollections();
+}
+
+function removeCollection(i) {
+  collectCollections();
+  siteData.collections.splice(i, 1);
+  renderCollections();
+}
+
+function moveCollection(i, dir) {
+  collectCollections();
+  var arr = siteData.collections;
+  var ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  var tmp = arr[i]; arr[i] = arr[ni]; arr[ni] = tmp;
+  renderCollections();
+}
+
+// ─── Candles ───
+function renderCandles() {
+  var list = document.getElementById('candles-list');
+  list.innerHTML = '';
+  siteData.candles.forEach(function(candle, i) {
+    list.appendChild(createCandleCard(candle, i));
+  });
+  list.querySelectorAll('.image-input-group input[type="url"]').forEach(setupImageInput);
+}
+
+function createCandleCard(candle, index) {
+  var div = document.createElement('div');
+  div.className = 'card-item';
+  div.innerHTML =
+    '<div class="card-item-header">' +
+      '<span class="card-item-title">Vela ' + (index + 1) + '</span>' +
+      '<div class="card-item-actions">' +
+        '<button class="card-btn up" onclick="moveCandle(' + index + ',-1)">Subir</button>' +
+        '<button class="card-btn down" onclick="moveCandle(' + index + ',1)">Descer</button>' +
+        '<button class="card-btn danger" onclick="removeCandle(' + index + ')">Remover</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fields-row">' +
+      '<div class="field">' +
+        '<label class="field-label">Nome</label>' +
+        '<input type="text" data-field="name" value="' + escHtml(candle.name) + '">' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Tag</label>' +
+        '<input type="text" data-field="tag" value="' + escHtml(candle.tag) + '">' +
+      '</div>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Descrição</label>' +
+      '<textarea data-field="description" rows="2">' + escHtml(candle.description) + '</textarea>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Imagem</label>' +
+      '<div class="image-input-group">' +
+        '<div class="image-input-row">' +
+          '<input type="url" data-field="image" value="' + escHtml(candle.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+        '</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
+        '<div class="image-preview' + (candle.image ? ' visible' : '') + '"><img src="' + escHtml(candle.image) + '"></div>' +
+      '</div>' +
+    '</div>';
+  return div;
+}
+
+function collectCandles() {
+  var cards = document.querySelectorAll('#candles-list .card-item');
+  siteData.candles = [];
+  cards.forEach(function(card) {
+    siteData.candles.push({
+      name: card.querySelector('[data-field="name"]').value,
+      description: card.querySelector('[data-field="description"]').value,
+      tag: card.querySelector('[data-field="tag"]').value,
+      image: card.querySelector('[data-field="image"]').value
+    });
+  });
+}
+
+function addCandle() {
+  collectCandles();
+  siteData.candles.push({ name: '', description: '', tag: '', image: '' });
+  renderCandles();
+}
+
+function removeCandle(i) {
+  collectCandles();
+  siteData.candles.splice(i, 1);
+  renderCandles();
+}
+
+function moveCandle(i, dir) {
+  collectCandles();
+  var arr = siteData.candles;
+  var ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  var tmp = arr[i]; arr[i] = arr[ni]; arr[ni] = tmp;
+  renderCandles();
+}
+
+// ─── Instagram Photos ───
+function renderInstagram() {
+  var list = document.getElementById('instagram-list');
+  list.innerHTML = '';
+  siteData.instagramPhotos.forEach(function(photo, i) {
+    list.appendChild(createInstagramCard(photo, i));
+  });
+  list.querySelectorAll('.image-input-group input[type="url"]').forEach(setupImageInput);
+}
+
+function createInstagramCard(photo, index) {
+  var div = document.createElement('div');
+  div.className = 'card-item';
+  div.innerHTML =
+    '<div class="card-item-header">' +
+      '<span class="card-item-title">Foto ' + (index + 1) + '</span>' +
+      '<div class="card-item-actions">' +
+        '<button class="card-btn danger" onclick="removeInstagramPhoto(' + index + ')">Remover</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Imagem</label>' +
+      '<div class="image-input-group">' +
+        '<div class="image-input-row">' +
+          '<input type="url" data-field="image" value="' + escHtml(photo.image) + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+        '</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho. O sistema ajusta sozinho.</div>' +
+        '<div class="image-preview' + (photo.image ? ' visible' : '') + '"><img src="' + escHtml(photo.image) + '"></div>' +
+      '</div>' +
+    '</div>';
+  return div;
+}
+
+function collectInstagram() {
+  var cards = document.querySelectorAll('#instagram-list .card-item');
+  siteData.instagramPhotos = [];
+  cards.forEach(function(card) {
+    siteData.instagramPhotos.push({
+      image: card.querySelector('[data-field="image"]').value
+    });
+  });
+}
+
+function addInstagramPhoto() {
+  collectInstagram();
+  siteData.instagramPhotos.push({ image: '' });
+  renderInstagram();
+}
+
+function removeInstagramPhoto(i) {
+  collectInstagram();
+  siteData.instagramPhotos.splice(i, 1);
+  renderInstagram();
+}
+
+// ─── Ticker ───
+function renderTicker() {
+  var list = document.getElementById('ticker-list');
+  list.innerHTML = '';
+  siteData.ticker.forEach(function(text, i) {
+    var div = document.createElement('div');
+    div.className = 'ticker-item';
+    div.innerHTML =
+      '<input type="text" value="' + escHtml(text) + '" data-index="' + i + '">' +
+      '<button class="card-btn danger" onclick="removeTickerItem(' + i + ')">Remover</button>';
+    list.appendChild(div);
+  });
+}
+
+function collectTicker() {
+  var items = document.querySelectorAll('#ticker-list .ticker-item input');
+  siteData.ticker = [];
+  items.forEach(function(input) {
+    siteData.ticker.push(input.value);
+  });
+}
+
+function addTickerItem() {
+  collectTicker();
+  siteData.ticker.push('');
+  renderTicker();
+  // Focus the new item
+  var items = document.querySelectorAll('#ticker-list .ticker-item input');
+  if (items.length) items[items.length - 1].focus();
+}
+
+function removeTickerItem(i) {
+  collectTicker();
+  siteData.ticker.splice(i, 1);
+  renderTicker();
+}
+
+// ─── Features / Diferenciais ───
+var iconOptions = [
+  { value: 'hand', label: 'Mão (Feito à mão)' },
+  { value: 'shield', label: 'Escudo (Qualidade)' },
+  { value: 'grid', label: 'Grade (Personalizado)' },
+  { value: 'heart', label: 'Coração (Amor)' },
+  { value: 'star', label: 'Estrela' },
+  { value: 'leaf', label: 'Folha (Natural)' },
+  { value: 'flame', label: 'Chama (Velas)' }
+];
+
+function renderFeatures() {
+  var list = document.getElementById('features-list');
+  list.innerHTML = '';
+  // Ensure always 4 features
+  while (siteData.features.length < 4) {
+    siteData.features.push({ icon: 'star', title: '', text: '' });
+  }
+  siteData.features.forEach(function(feat, i) {
+    var div = document.createElement('div');
+    div.className = 'card-item';
+    var selectHtml = '<select data-field="icon">';
+    iconOptions.forEach(function(opt) {
+      selectHtml += '<option value="' + opt.value + '"' + (feat.icon === opt.value ? ' selected' : '') + '>' + opt.label + '</option>';
+    });
+    selectHtml += '</select>';
+
+    div.innerHTML =
+      '<div class="card-item-header">' +
+        '<span class="card-item-title">Diferencial ' + (i + 1) + '</span>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Ícone</label>' +
+        selectHtml +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Título</label>' +
+        '<input type="text" data-field="title" value="' + escHtml(feat.title) + '">' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Texto</label>' +
+        '<textarea data-field="text" rows="2">' + escHtml(feat.text) + '</textarea>' +
+      '</div>';
+    list.appendChild(div);
+  });
+}
+
+function collectFeatures() {
+  var cards = document.querySelectorAll('#features-list .card-item');
+  siteData.features = [];
+  cards.forEach(function(card) {
+    siteData.features.push({
+      icon: card.querySelector('[data-field="icon"]').value,
+      title: card.querySelector('[data-field="title"]').value,
+      text: card.querySelector('[data-field="text"]').value
+    });
+  });
+}
+
+// ─── Custom Sections ───
+var sectionTypeLabels = {
+  gallery: 'Galeria',
+  products: 'Produtos',
+  textimage: 'Texto e Imagem',
+  banner: 'Banner'
+};
+
+function renderCustomSections() {
+  var list = document.getElementById('custom-sections-list');
+  list.innerHTML = '';
+  if (!siteData.customSections) siteData.customSections = [];
+  siteData.customSections.forEach(function(sec, i) {
+    list.appendChild(createCustomSectionCard(sec, i));
+  });
+  list.querySelectorAll('.image-input-group input[type="url"]').forEach(setupImageInput);
+}
+
+function createCustomSectionCard(sec, index) {
+  var div = document.createElement('div');
+  div.className = 'card-item';
+
+  var headerHtml =
+    '<div class="card-item-header">' +
+      '<span class="card-item-title">' + (sectionTypeLabels[sec.type] || sec.type) + ' — Seção ' + (index + 1) + '</span>' +
+      '<div class="card-item-actions">' +
+        '<button class="card-btn up" onclick="moveCustomSection(' + index + ',-1)">Subir</button>' +
+        '<button class="card-btn down" onclick="moveCustomSection(' + index + ',1)">Descer</button>' +
+        '<button class="card-btn danger" onclick="removeCustomSection(' + index + ')">Remover</button>' +
+      '</div>' +
+    '</div>';
+
+  var commonFields =
+    '<div class="field">' +
+      '<label class="field-label">Frase de destaque</label>' +
+      '<input type="text" data-field="eyebrow" value="' + escHtml(sec.eyebrow || '') + '" placeholder="Aparece em itálico acima do título">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Título</label>' +
+      '<input type="text" data-field="title" value="' + escHtml(sec.title || '') + '">' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Descrição</label>' +
+      '<textarea data-field="subtitle" rows="2">' + escHtml(sec.subtitle || '') + '</textarea>' +
+    '</div>' +
+    '<div class="field">' +
+      '<label class="field-label">Estilo do fundo</label>' +
+      '<select data-field="bgDark">' +
+        '<option value="false"' + (!sec.bgDark ? ' selected' : '') + '>Claro (bege)</option>' +
+        '<option value="true"' + (sec.bgDark ? ' selected' : '') + '>Escuro (marrom)</option>' +
+      '</select>' +
+    '</div>';
+
+  var itemsHtml = '';
+
+  if (sec.type === 'gallery' || sec.type === 'products') {
+    var items = sec.items || [];
+    itemsHtml += '<div class="cs-items" data-section="' + index + '">';
+    items.forEach(function(item, j) {
+      itemsHtml += createCustomSectionItem(sec.type, item, index, j);
+    });
+    itemsHtml += '</div>';
+    itemsHtml += '<button type="button" class="add-btn" onclick="addCustomSectionItem(' + index + ')">Adicionar item</button>';
+  }
+
+  if (sec.type === 'textimage') {
+    itemsHtml +=
+      '<div class="field">' +
+        '<label class="field-label">Texto</label>' +
+        '<textarea data-field="csText" rows="4">' + escHtml(sec.csText || '') + '</textarea>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Imagem</label>' +
+        '<div class="image-input-group">' +
+          '<div class="image-input-row">' +
+            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Cole o link da foto">' +
+            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+          '</div>' +
+          '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
+          '<div class="image-preview' + (sec.csImage ? ' visible' : '') + '"><img src="' + escHtml(sec.csImage || '') + '"></div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  if (sec.type === 'banner') {
+    itemsHtml +=
+      '<div class="field">' +
+        '<label class="field-label">Texto do botão</label>' +
+        '<input type="text" data-field="csBtnText" value="' + escHtml(sec.csBtnText || '') + '">' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Link do botão</label>' +
+        '<input type="text" data-field="csBtnLink" value="' + escHtml(sec.csBtnLink || '') + '">' +
+      '</div>' +
+      '<div class="field">' +
+        '<label class="field-label">Imagem de fundo</label>' +
+        '<div class="image-input-group">' +
+          '<div class="image-input-row">' +
+            '<input type="url" data-field="csImage" value="' + escHtml(sec.csImage || '') + '" placeholder="Cole o link da foto">' +
+            '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+          '</div>' +
+          '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
+          '<div class="image-preview' + (sec.csImage ? ' visible' : '') + '"><img src="' + escHtml(sec.csImage || '') + '"></div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  div.innerHTML = headerHtml + commonFields + itemsHtml;
+  return div;
+}
+
+function createCustomSectionItem(type, item, secIdx, itemIdx) {
+  item = item || {};
+  var html = '<div class="card-item" style="margin-left:12px;border-left:3px solid var(--clay);margin-bottom:12px;">';
+  html += '<div class="card-item-header">' +
+    '<span class="card-item-title" style="font-size:.95rem;">Item ' + (itemIdx + 1) + '</span>' +
+    '<button class="card-btn danger" onclick="removeCustomSectionItem(' + secIdx + ',' + itemIdx + ')">Remover</button>' +
+    '</div>';
+
+  if (type === 'products') {
+    html +=
+      '<div class="fields-row">' +
+        '<div class="field"><label class="field-label">Nome</label>' +
+          '<input type="text" data-item-field="name" value="' + escHtml(item.name || '') + '"></div>' +
+        '<div class="field"><label class="field-label">Preço</label>' +
+          '<input type="text" data-item-field="price" value="' + escHtml(item.price || '') + '"></div>' +
+      '</div>' +
+      '<div class="field"><label class="field-label">Descrição</label>' +
+        '<input type="text" data-item-field="description" value="' + escHtml(item.description || '') + '"></div>';
+  } else {
+    html +=
+      '<div class="field"><label class="field-label">Título</label>' +
+        '<input type="text" data-item-field="title" value="' + escHtml(item.title || '') + '"></div>';
+  }
+
+  html +=
+    '<div class="field"><label class="field-label">Imagem</label>' +
+      '<div class="image-input-group">' +
+        '<div class="image-input-row">' +
+          '<input type="url" data-item-field="image" value="' + escHtml(item.image || '') + '" placeholder="Cole o link da foto">' +
+          '<button type="button" class="gdrive-btn" onclick="toggleDriveHelper(this)">Ajuda</button>' +
+        '</div>' +
+        '<div class="gdrive-helper">Cole o link do Google Drive. O sistema ajusta sozinho.</div>' +
+        '<div class="image-preview' + (item.image ? ' visible' : '') + '"><img src="' + escHtml(item.image || '') + '"></div>' +
+      '</div>' +
+    '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function collectCustomSections() {
+  var cards = document.querySelectorAll('#custom-sections-list > .card-item');
+  var sections = [];
+  cards.forEach(function(card, i) {
+    var existing = siteData.customSections[i] || {};
+    var sec = {
+      id: existing.id || generateId(),
+      type: existing.type || 'gallery',
+      eyebrow: (card.querySelector('[data-field="eyebrow"]') || {}).value || '',
+      title: (card.querySelector('[data-field="title"]') || {}).value || '',
+      subtitle: (card.querySelector('[data-field="subtitle"]') || {}).value || '',
+      bgDark: (card.querySelector('[data-field="bgDark"]') || {}).value === 'true',
+      order: i,
+      items: []
+    };
+
+    if (sec.type === 'textimage' || sec.type === 'banner') {
+      sec.csImage = (card.querySelector('[data-field="csImage"]') || {}).value || '';
+    }
+    if (sec.type === 'textimage') {
+      sec.csText = (card.querySelector('[data-field="csText"]') || {}).value || '';
+    }
+    if (sec.type === 'banner') {
+      sec.csBtnText = (card.querySelector('[data-field="csBtnText"]') || {}).value || '';
+      sec.csBtnLink = (card.querySelector('[data-field="csBtnLink"]') || {}).value || '';
+    }
+
+    if (sec.type === 'gallery' || sec.type === 'products') {
+      var itemCards = card.querySelectorAll('.cs-items > .card-item');
+      itemCards.forEach(function(ic) {
+        var item = {};
+        if (sec.type === 'products') {
+          item.name = (ic.querySelector('[data-item-field="name"]') || {}).value || '';
+          item.price = (ic.querySelector('[data-item-field="price"]') || {}).value || '';
+          item.description = (ic.querySelector('[data-item-field="description"]') || {}).value || '';
+        } else {
+          item.title = (ic.querySelector('[data-item-field="title"]') || {}).value || '';
+        }
+        item.image = (ic.querySelector('[data-item-field="image"]') || {}).value || '';
+        sec.items.push(item);
+      });
+    }
+
+    sections.push(sec);
+  });
+  siteData.customSections = sections;
+}
+
+function addCustomSection(type) {
+  collectCustomSections();
+  siteData.customSections.push({
+    id: generateId(),
+    type: type,
+    title: '',
+    eyebrow: '',
+    subtitle: '',
+    items: [],
+    order: siteData.customSections.length,
+    bgDark: false
+  });
+  renderCustomSections();
+  // Scroll to the new section
+  var items = document.querySelectorAll('#custom-sections-list > .card-item');
+  if (items.length) items[items.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function removeCustomSection(i) {
+  collectCustomSections();
+  siteData.customSections.splice(i, 1);
+  renderCustomSections();
+}
+
+function moveCustomSection(i, dir) {
+  collectCustomSections();
+  var arr = siteData.customSections;
+  var ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  var tmp = arr[i]; arr[i] = arr[ni]; arr[ni] = tmp;
+  renderCustomSections();
+}
+
+function addCustomSectionItem(secIdx) {
+  collectCustomSections();
+  if (!siteData.customSections[secIdx].items) siteData.customSections[secIdx].items = [];
+  siteData.customSections[secIdx].items.push({});
+  renderCustomSections();
+}
+
+function removeCustomSectionItem(secIdx, itemIdx) {
+  collectCustomSections();
+  siteData.customSections[secIdx].items.splice(itemIdx, 1);
+  renderCustomSections();
+}
+
+// ─────────────────────────── COLLECT ALL ───────────────────────────
+function collectAll() {
+  collectGeral();
+  collectHero();
+  collectAbout();
+  collectCollections();
+  collectCandles();
+  collectInstagram();
+  collectTicker();
+  collectFeatures();
+  collectCustomSections();
+}
+
+// ─────────────────────────── RENDER ALL ───────────────────────────
+function renderAll() {
+  renderGeral();
+  renderHero();
+  renderAbout();
+  renderCollections();
+  renderCandles();
+  renderInstagram();
+  renderTicker();
+  renderFeatures();
+  renderCustomSections();
+  // Setup image inputs for static fields
+  document.querySelectorAll('#tab-hero .image-input-group input[type="url"], #tab-sobre .image-input-group input[type="url"]').forEach(setupImageInput);
+}
+
+// ─────────────────────────── LOAD DATA ───────────────────────────
+function loadData() {
+  if (!isConfigured || !db) return;
+  showLoading();
+  db.collection('site').doc('content').get()
+    .then(function(doc) {
+      if (doc.exists) {
+        var data = doc.data();
+        // Merge with defaults so new fields always exist
+        var defaults = getDefaults();
+        Object.keys(defaults).forEach(function(key) {
+          if (data[key] === undefined) {
+            data[key] = defaults[key];
+          } else if (typeof defaults[key] === 'object' && !Array.isArray(defaults[key])) {
+            // Merge nested objects
+            Object.keys(defaults[key]).forEach(function(subKey) {
+              if (data[key][subKey] === undefined) {
+                data[key][subKey] = defaults[key][subKey];
+              }
+            });
+          }
+        });
+        siteData = data;
+      } else {
+        siteData = getDefaults();
+      }
+      renderAll();
+      hideLoading();
+    })
+    .catch(function(err) {
+      console.error('Erro ao carregar dados:', err);
+      showToast('Erro ao carregar dados. Usando valores padrão.', 'error');
+      siteData = getDefaults();
+      renderAll();
+      hideLoading();
+    });
+}
+
+// ─────────────────────────── SAVE DATA ───────────────────────────
+function saveAll() {
+  if (!isConfigured || !db) {
+    showToast('Firebase não está configurado.', 'error');
+    return;
+  }
+  collectAll();
+  var btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+  showLoading();
+
+  db.collection('site').doc('content').set(siteData)
+    .then(function() {
+      hideLoading();
+      btn.disabled = false;
+      btn.textContent = 'Publicar alterações';
+      showToast('Alterações publicadas com sucesso!');
+    })
+    .catch(function(err) {
+      hideLoading();
+      btn.disabled = false;
+      btn.textContent = 'Publicar alterações';
+      console.error('Erro ao salvar:', err);
+      var msg = 'Erro ao salvar. Tente novamente.';
+      if (err.code === 'permission-denied') {
+        msg = 'Sem permissão para salvar. Verifique as regras do Firestore.';
+      }
+      showToast(msg, 'error');
+    });
+}
+
+// ─────────────────────────── UTILITIES ───────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML.replace(/"/g, '&quot;');
+}
+
+function generateId() {
+  return 'sec_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
+}
+
+// ─── Initial render with defaults (for preview before login) ───
+renderAll();
+</script>
+</body>
+</html>
